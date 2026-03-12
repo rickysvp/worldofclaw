@@ -549,6 +549,12 @@ export const acknowledgeEvents = (input: { session_id: string; event_ids: string
   };
 };
 
+export const getSessionsForAdmin = (): BridgeSessionRecord[] =>
+  [...store.sessions.values()].map((session) => structuredClone(session));
+
+export const getQueuedActionsForAdmin = (): PendingAction[] =>
+  [...store.queued_actions.values()].flatMap((actions) => actions.map((action) => structuredClone(action)));
+
 export const appendWorldEventForTests = (input: { agent_id: string; tick?: number; title?: string }): string => {
   const tick = input.tick ?? store.world_state.meta.current_tick;
   const id = `event_bridge_${randomUUID()}`;
