@@ -1,0 +1,60 @@
+{
+  "facilities": [
+    {
+      "id": "facility_safe_generator_a",
+      "sector_id": "sector_0_0",
+      "facility_type": "generator",
+      "owner_user_id": null,
+      "public_use": true,
+      "claimable": false
+    },
+    {
+      "id": "facility_safe_shelter_a",
+      "sector_id": "sector_0_0",
+      "facility_type": "shelter",
+      "owner_user_id": null,
+      "public_use": true,
+      "claimable": false
+    },
+    {
+      "id": "facility_safe_storage_a",
+      "sector_id": "sector_0_0",
+      "facility_type": "storage",
+      "owner_user_id": null,
+      "public_use": true,
+      "claimable": false
+    },
+    {
+      "id": "facility_safe_generator_b",
+      "sector_id": "sector_0_4",
+      "facility_type": "generator",
+      "owner_user_id": null,
+      "public_use": true,
+      "claimable": false
+    },
+    {
+      "id": "facility_safe_shelter_b",
+      "sector_id": "sector_0_4",
+      "facility_type": "shelter",
+      "owner_user_id": null,
+      "public_use": true,
+      "claimable": false
+    },
+    {
+      "id": "facility_ruin_workshop_claim",
+      "sector_id": "sector_3_1",
+      "facility_type": "workshop",
+      "owner_user_id": null,
+      "public_use": false,
+      "claimable": true
+    },
+    {
+      "id": "facility_highland_relay_claim",
+      "sector_id": "sector_4_2",
+      "facility_type": "relay",
+      "owner_user_id": null,
+      "public_use": false,
+      "claimable": true
+    }
+  ]
+}

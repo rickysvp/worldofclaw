@@ -1,0 +1,16 @@
+{
+  "routes": [
+    {
+      "id": "main_route_alpha",
+      "sector_ids": [
+        "sector_1_0",
+        "sector_2_0",
+        "sector_2_1",
+        "sector_2_2",
+        "sector_2_3",
+        "sector_2_4"
+      ],
+      "route_level": 3
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "name": "openclaw-agent-world",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "test:m3": "vitest run tests/unit/resource-*.test.ts tests/unit/decay-rules.test.ts tests/unit/facility-production.test.ts tests/unit/facility-maintenance.test.ts tests/unit/action-costs.test.ts tests/unit/crafting-rules.test.ts tests/unit/refining-rules.test.ts tests/unit/charging-rules.test.ts tests/unit/repair-rules.test.ts tests/integration/world-resource-cycle.test.ts tests/integration/resource-cycle-smoke.test.ts tests/integration/no-negative-resource.test.ts",
+    "test:m4": "vitest run tests/unit/map-topology.test.ts tests/unit/facility-effects.test.ts tests/unit/sector-rules.test.ts tests/unit/adjacency-rules.test.ts tests/unit/movement-rules.test.ts tests/unit/facility-placement.test.ts tests/unit/facility-claim.test.ts tests/unit/control-rules.test.ts tests/integration/world-map-facility.test.ts tests/integration/map-smoke.test.ts tests/integration/sector-control-flow.test.ts tests/integration/movement-and-access.test.ts",
+    "test:m5": "vitest run tests/unit/action-*.test.ts tests/unit/charge-ledger.test.ts tests/integration/world-action-flow.test.ts tests/integration/action-queue-smoke.test.ts tests/integration/failed-action-ledger.test.ts",
+    "test:m6": "vitest run tests/unit/base-price.test.ts tests/unit/dynamic-price.test.ts tests/unit/regional-price.test.ts tests/unit/npc-market.test.ts tests/unit/player-market.test.ts tests/unit/quote.test.ts tests/unit/quote-filter.test.ts tests/unit/fee-policy.test.ts tests/unit/tax-policy.test.ts tests/unit/revenue-split.test.ts tests/unit/settlement-engine.test.ts tests/unit/accounting.test.ts tests/unit/treasury.test.ts tests/unit/audit.test.ts tests/unit/audit-opening-balance.test.ts tests/unit/balance-overdraft.test.ts tests/unit/service-pricing.test.ts tests/unit/market-*.test.ts tests/unit/charge-ledger.test.ts tests/integration/world-market-cycle.test.ts tests/integration/market-smoke.test.ts tests/integration/service-fee-flow.test.ts tests/integration/service-owner-split.test.ts tests/integration/platform-revenue-flow.test.ts tests/integration/price-shock-smoke.test.ts tests/integration/refinery-service-flow.test.ts",
+    "test:m8": "vitest run tests/unit/onboarding-*.test.ts tests/integration/first-agent-onboarding-smoke.test.ts tests/integration/onboarding-safety-window.test.ts tests/integration/onboarding-skill-prereq.test.ts tests/integration/onboarding-world-sync.test.ts",
+    "test:m9": "vitest run tests/unit/register-schema.test.ts tests/unit/heartbeat-schema.test.ts tests/unit/action-submit-schema.test.ts tests/unit/token-lifecycle.test.ts tests/unit/idempotency.test.ts tests/integration/register-claim-flow.test.ts tests/integration/heartbeat-liveness-flow.test.ts tests/integration/state-jobs-action-flow.test.ts tests/integration/reconnect-recovery-flow.test.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "typescript": "^5.8.2",
+    "vitest": "^1.6.1",
+    "zod": "^3.25.76"
+  }
+}

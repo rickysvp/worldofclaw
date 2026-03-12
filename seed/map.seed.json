@@ -1,0 +1,12 @@
+{
+  "map_width": 5,
+  "map_height": 5,
+  "safe_zone_sector_ids": [
+    "sector_0_0",
+    "sector_0_4"
+  ],
+  "blocked_sector_ids": [],
+  "main_route_ids": [
+    "main_route_alpha"
+  ]
+}

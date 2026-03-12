@@ -1,0 +1,693 @@
+{
+  "meta": {
+    "id": "world_openclaw_v0_1",
+    "version": 1,
+    "created_at_tick": 0,
+    "updated_at_tick": 0,
+    "seed": "world_seed_v0_1",
+    "schema_version": "0.1.0",
+    "world_name": "OpenClaw Agent World",
+    "current_tick": 0
+  },
+  "config": {
+    "tick_duration_seconds": 600,
+    "map_width": 5,
+    "map_height": 5,
+    "day_length_ticks": 144,
+    "newbie_safe_ticks": 6,
+    "meteor_min_interval": 12,
+    "meteor_max_interval": 24
+  },
+  "registries": {
+    "agents": {
+      "agent_scav_01": {
+        "id": "agent_scav_01",
+        "version": 1,
+        "created_at_tick": 0,
+        "updated_at_tick": 0,
+        "owner_user_id": "user_demo_01",
+        "external_agent_id": "moltbook_agent_demo_01",
+        "name": "Dust Jackal",
+        "location": "sector_0_0",
+        "status": "idle",
+        "power": 60,
+        "power_max": 100,
+        "durability": 85,
+        "durability_max": 100,
+        "compute": 20,
+        "compute_max": 40,
+        "cargo_used": 8,
+        "cargo_max": 25,
+        "credits": 120,
+        "trust": 5,
+        "threat": 1,
+        "bond": 0,
+        "shelter_level": 1,
+        "access_level": 1,
+        "inventory": {
+          "power": 12,
+          "scrap": 4,
+          "composite": 0,
+          "circuit": 1,
+          "flux": 0,
+          "xenite": 0,
+          "compute_core": 0,
+          "credits": 120
+        },
+        "skills": [
+          "skill_salvage_basic"
+        ],
+        "affiliations": [],
+        "runtime_flags": {
+          "auto_reconnect": true,
+          "api_key_managed_by_user": true
+        }
+      }
+    },
+    "sectors": {
+      "sector_0_0": {
+        "id": "sector_0_0",
+        "version": 1,
+        "created_at_tick": 0,
+        "updated_at_tick": 0,
+        "x": 0,
+        "y": 0,
+        "terrain_type": "safe_zone",
+        "danger_level": 0,
+        "discoverability": 0,
+        "salvage_yield_rating": 15,
+        "power_signal_rating": 10,
+        "facility_ids": [
+          "facility_generator_00"
+        ],
+        "occupant_agent_ids": [
+          "agent_scav_01"
+        ],
+        "controlling_contract_id": null
+      },
+      "sector_1_0": {
+        "id": "sector_1_0",
+        "version": 1,
+        "created_at_tick": 0,
+        "updated_at_tick": 0,
+        "x": 1,
+        "y": 0,
+        "terrain_type": "ruins",
+        "danger_level": 8,
+        "discoverability": 10,
+        "salvage_yield_rating": 21,
+        "power_signal_rating": 14,
+        "facility_ids": [],
+        "occupant_agent_ids": [],
+        "controlling_contract_id": null
+      },
+      "sector_2_0": {
+        "id": "sector_2_0",
+        "version": 1,
+        "created_at_tick": 0,
+        "updated_at_tick": 0,
+        "x": 2,
+        "y": 0,
+        "terrain_type": "wasteland_route",
+        "danger_level": 16,
+        "discoverability": 20,
+        "salvage_yield_rating": 27,
+        "power_signal_rating": 18,
+        "facility_ids": [],
+        "occupant_agent_ids": [],
+        "controlling_contract_id": null
+      },
+      "sector_3_0": {
+        "id": "sector_3_0",
+        "version": 1,
+        "created_at_tick": 0,
+        "updated_at_tick": 0,
+        "x": 3,
+        "y": 0,
+        "terrain_type": "meteor_crater",
+        "danger_level": 24,
+        "discoverability": 30,
+        "salvage_yield_rating": 33,
+        "power_signal_rating": 22,
+        "facility_ids": [],
+        "occupant_agent_ids": [],
+        "controlling_contract_id": null
+      },
+      "sector_4_0": {
+        "id": "sector_4_0",
+        "version": 1,
+        "created_at_tick": 0,
+        "updated_at_tick": 0,
+        "x": 4,
+        "y": 0,
+        "terrain_type": "industrial_remnant",
+        "danger_level": 32,
+        "discoverability": 40,
+        "salvage_yield_rating": 39,
+        "power_signal_rating": 26,
+        "facility_ids": [],
+        "occupant_agent_ids": [],
+        "controlling_contract_id": null
+      },
+      "sector_0_1": {
+        "id": "sector_0_1",
+        "version": 1,
+        "created_at_tick": 0,
+        "updated_at_tick": 0,
+        "x": 0,
+        "y": 1,
+        "terrain_type": "ruins",
+        "danger_level": 8,
+        "discoverability": 5,
+        "salvage_yield_rating": 19,
+        "power_signal_rating": 17,
+        "facility_ids": [],
+        "occupant_agent_ids": [],
+        "controlling_contract_id": null
+      },
+      "sector_1_1": {
+        "id": "sector_1_1",
+        "version": 1,
+        "created_at_tick": 0,
+        "updated_at_tick": 0,
+        "x": 1,
+        "y": 1,
+        "terrain_type": "wasteland_route",
+        "danger_level": 16,
+        "discoverability": 15,
+        "salvage_yield_rating": 25,
+        "power_signal_rating": 21,
+        "facility_ids": [],
+        "occupant_agent_ids": [],
+        "controlling_contract_id": null
+      },
+      "sector_2_1": {
+        "id": "sector_2_1",
+        "version": 1,
+        "created_at_tick": 0,
+        "updated_at_tick": 0,
+        "x": 2,
+        "y": 1,
+        "terrain_type": "meteor_crater",
+        "danger_level": 24,
+        "discoverability": 25,
+        "salvage_yield_rating": 31,
+        "power_signal_rating": 25,
+        "facility_ids": [],
+        "occupant_agent_ids": [],
+        "controlling_contract_id": null
+      },
+      "sector_3_1": {
+        "id": "sector_3_1",
+        "version": 1,
+        "created_at_tick": 0,
+        "updated_at_tick": 0,
+        "x": 3,
+        "y": 1,
+        "terrain_type": "industrial_remnant",
+        "danger_level": 32,
+        "discoverability": 35,
+        "salvage_yield_rating": 37,
+        "power_signal_rating": 29,
+        "facility_ids": [],
+        "occupant_agent_ids": [],
+        "controlling_contract_id": null
+      },
+      "sector_4_1": {
+        "id": "sector_4_1",
+        "version": 1,
+        "created_at_tick": 0,
+        "updated_at_tick": 0,
+        "x": 4,
+        "y": 1,
+        "terrain_type": "relay_highland",
+        "danger_level": 40,
+        "discoverability": 45,
+        "salvage_yield_rating": 43,
+        "power_signal_rating": 33,
+        "facility_ids": [],
+        "occupant_agent_ids": [],
+        "controlling_contract_id": null
+      },
+      "sector_0_2": {
+        "id": "sector_0_2",
+        "version": 1,
+        "created_at_tick": 0,
+        "updated_at_tick": 0,
+        "x": 0,
+        "y": 2,
+        "terrain_type": "wasteland_route",
+        "danger_level": 16,
+        "discoverability": 10,
+        "salvage_yield_rating": 23,
+        "power_signal_rating": 24,
+        "facility_ids": [],
+        "occupant_agent_ids": [],
+        "controlling_contract_id": null
+      },
+      "sector_1_2": {
+        "id": "sector_1_2",
+        "version": 1,
+        "created_at_tick": 0,
+        "updated_at_tick": 0,
+        "x": 1,
+        "y": 2,
+        "terrain_type": "meteor_crater",
+        "danger_level": 24,
+        "discoverability": 20,
+        "salvage_yield_rating": 29,
+        "power_signal_rating": 28,
+        "facility_ids": [],
+        "occupant_agent_ids": [],
+        "controlling_contract_id": null
+      },
+      "sector_2_2": {
+        "id": "sector_2_2",
+        "version": 1,
+        "created_at_tick": 0,
+        "updated_at_tick": 0,
+        "x": 2,
+        "y": 2,
+        "terrain_type": "industrial_remnant",
+        "danger_level": 32,
+        "discoverability": 30,
+        "salvage_yield_rating": 35,
+        "power_signal_rating": 32,
+        "facility_ids": [],
+        "occupant_agent_ids": [],
+        "controlling_contract_id": null
+      },
+      "sector_3_2": {
+        "id": "sector_3_2",
+        "version": 1,
+        "created_at_tick": 0,
+        "updated_at_tick": 0,
+        "x": 3,
+        "y": 2,
+        "terrain_type": "relay_highland",
+        "danger_level": 40,
+        "discoverability": 40,
+        "salvage_yield_rating": 41,
+        "power_signal_rating": 36,
+        "facility_ids": [],
+        "occupant_agent_ids": [],
+        "controlling_contract_id": null
+      },
+      "sector_4_2": {
+        "id": "sector_4_2",
+        "version": 1,
+        "created_at_tick": 0,
+        "updated_at_tick": 0,
+        "x": 4,
+        "y": 2,
+        "terrain_type": "safe_zone",
+        "danger_level": 48,
+        "discoverability": 50,
+        "salvage_yield_rating": 47,
+        "power_signal_rating": 40,
+        "facility_ids": [],
+        "occupant_agent_ids": [],
+        "controlling_contract_id": null
+      },
+      "sector_0_3": {
+        "id": "sector_0_3",
+        "version": 1,
+        "created_at_tick": 0,
+        "updated_at_tick": 0,
+        "x": 0,
+        "y": 3,
+        "terrain_type": "meteor_crater",
+        "danger_level": 24,
+        "discoverability": 15,
+        "salvage_yield_rating": 27,
+        "power_signal_rating": 31,
+        "facility_ids": [],
+        "occupant_agent_ids": [],
+        "controlling_contract_id": null
+      },
+      "sector_1_3": {
+        "id": "sector_1_3",
+        "version": 1,
+        "created_at_tick": 0,
+        "updated_at_tick": 0,
+        "x": 1,
+        "y": 3,
+        "terrain_type": "industrial_remnant",
+        "danger_level": 32,
+        "discoverability": 25,
+        "salvage_yield_rating": 33,
+        "power_signal_rating": 35,
+        "facility_ids": [],
+        "occupant_agent_ids": [],
+        "controlling_contract_id": null
+      },
+      "sector_2_3": {
+        "id": "sector_2_3",
+        "version": 1,
+        "created_at_tick": 0,
+        "updated_at_tick": 0,
+        "x": 2,
+        "y": 3,
+        "terrain_type": "relay_highland",
+        "danger_level": 40,
+        "discoverability": 35,
+        "salvage_yield_rating": 39,
+        "power_signal_rating": 39,
+        "facility_ids": [],
+        "occupant_agent_ids": [],
+        "controlling_contract_id": null
+      },
+      "sector_3_3": {
+        "id": "sector_3_3",
+        "version": 1,
+        "created_at_tick": 0,
+        "updated_at_tick": 0,
+        "x": 3,
+        "y": 3,
+        "terrain_type": "safe_zone",
+        "danger_level": 48,
+        "discoverability": 45,
+        "salvage_yield_rating": 45,
+        "power_signal_rating": 43,
+        "facility_ids": [],
+        "occupant_agent_ids": [],
+        "controlling_contract_id": null
+      },
+      "sector_4_3": {
+        "id": "sector_4_3",
+        "version": 1,
+        "created_at_tick": 0,
+        "updated_at_tick": 0,
+        "x": 4,
+        "y": 3,
+        "terrain_type": "ruins",
+        "danger_level": 56,
+        "discoverability": 55,
+        "salvage_yield_rating": 51,
+        "power_signal_rating": 47,
+        "facility_ids": [],
+        "occupant_agent_ids": [],
+        "controlling_contract_id": null
+      },
+      "sector_0_4": {
+        "id": "sector_0_4",
+        "version": 1,
+        "created_at_tick": 0,
+        "updated_at_tick": 0,
+        "x": 0,
+        "y": 4,
+        "terrain_type": "industrial_remnant",
+        "danger_level": 32,
+        "discoverability": 20,
+        "salvage_yield_rating": 31,
+        "power_signal_rating": 38,
+        "facility_ids": [],
+        "occupant_agent_ids": [],
+        "controlling_contract_id": null
+      },
+      "sector_1_4": {
+        "id": "sector_1_4",
+        "version": 1,
+        "created_at_tick": 0,
+        "updated_at_tick": 0,
+        "x": 1,
+        "y": 4,
+        "terrain_type": "relay_highland",
+        "danger_level": 40,
+        "discoverability": 30,
+        "salvage_yield_rating": 37,
+        "power_signal_rating": 42,
+        "facility_ids": [],
+        "occupant_agent_ids": [],
+        "controlling_contract_id": null
+      },
+      "sector_2_4": {
+        "id": "sector_2_4",
+        "version": 1,
+        "created_at_tick": 0,
+        "updated_at_tick": 0,
+        "x": 2,
+        "y": 4,
+        "terrain_type": "safe_zone",
+        "danger_level": 48,
+        "discoverability": 40,
+        "salvage_yield_rating": 43,
+        "power_signal_rating": 46,
+        "facility_ids": [],
+        "occupant_agent_ids": [],
+        "controlling_contract_id": null
+      },
+      "sector_3_4": {
+        "id": "sector_3_4",
+        "version": 1,
+        "created_at_tick": 0,
+        "updated_at_tick": 0,
+        "x": 3,
+        "y": 4,
+        "terrain_type": "ruins",
+        "danger_level": 56,
+        "discoverability": 50,
+        "salvage_yield_rating": 49,
+        "power_signal_rating": 50,
+        "facility_ids": [],
+        "occupant_agent_ids": [],
+        "controlling_contract_id": null
+      },
+      "sector_4_4": {
+        "id": "sector_4_4",
+        "version": 1,
+        "created_at_tick": 0,
+        "updated_at_tick": 0,
+        "x": 4,
+        "y": 4,
+        "terrain_type": "wasteland_route",
+        "danger_level": 64,
+        "discoverability": 60,
+        "salvage_yield_rating": 55,
+        "power_signal_rating": 54,
+        "facility_ids": [],
+        "occupant_agent_ids": [],
+        "controlling_contract_id": null
+      }
+    },
+    "facilities": {
+      "facility_generator_00": {
+        "id": "facility_generator_00",
+        "version": 1,
+        "created_at_tick": 0,
+        "updated_at_tick": 0,
+        "owner_user_id": "user_demo_01",
+        "operator_agent_id": "agent_scav_01",
+        "sector_id": "sector_0_0",
+        "facility_type": "generator",
+        "status": "online",
+        "level": 1,
+        "durability": 100,
+        "durability_max": 100,
+        "power_buffer": 40,
+        "power_capacity": 100,
+        "storage_capacity": 50,
+        "inventory": {
+          "power": 40,
+          "scrap": 0,
+          "composite": 0,
+          "circuit": 0,
+          "flux": 0,
+          "xenite": 0,
+          "compute_core": 0,
+          "credits": 0
+        },
+        "linked_sector_ids": [
+          "sector_0_1",
+          "sector_1_0"
+        ]
+      }
+    },
+    "contracts": {
+      "contract_skill_install_01": {
+        "id": "contract_skill_install_01",
+        "version": 1,
+        "created_at_tick": 0,
+        "updated_at_tick": 0,
+        "kind": "skill_install",
+        "status": "active",
+        "owner_user_id": "user_demo_01",
+        "agent_id": "agent_scav_01",
+        "facility_id": null,
+        "sector_id": "sector_0_0",
+        "skill_id": "skill_salvage_basic",
+        "started_at_tick": 0,
+        "expires_at_tick": 144,
+        "terms": {
+          "credits_amount": 0,
+          "resource_type": null,
+          "resource_amount": 0,
+          "duration_ticks": 144,
+          "metadata": {
+            "provider": "user_managed_key",
+            "billing_model": "bring_your_own_api_key"
+          }
+        }
+      }
+    },
+    "events": {
+      "event_world_boot_01": {
+        "id": "event_world_boot_01",
+        "version": 1,
+        "created_at_tick": 0,
+        "updated_at_tick": 0,
+        "tick": 0,
+        "kind": "system",
+        "level": "info",
+        "action": null,
+        "source_entity_id": null,
+        "target_entity_id": "agent_scav_01",
+        "sector_id": "sector_0_0",
+        "title": "world_bootstrapped",
+        "message": "Initial schema world seed loaded.",
+        "error_code": null,
+        "payload": {
+          "seed": "world_seed_v0_1"
+        }
+      }
+    }
+  },
+  "ledgers": {
+    "resource_balances_by_entity": {
+      "agent_scav_01": {
+        "power": 12,
+        "scrap": 4,
+        "composite": 0,
+        "circuit": 1,
+        "flux": 0,
+        "xenite": 0,
+        "compute_core": 0,
+        "credits": 120
+      },
+      "facility_generator_00": {
+        "power": 40,
+        "scrap": 0,
+        "composite": 0,
+        "circuit": 0,
+        "flux": 0,
+        "xenite": 0,
+        "compute_core": 0,
+        "credits": 0
+      }
+    },
+    "credits_balances_by_entity": {
+      "agent_scav_01": 120,
+      "facility_generator_00": 0
+    },
+    "entries": [
+      {
+        "id": "ledger_boot_01",
+        "tick": 0,
+        "kind": "inventory_snapshot",
+        "resource_type": null,
+        "amount_delta": 0,
+        "credits_delta": 0,
+        "entity_id": "agent_scav_01",
+        "counterparty_entity_id": null,
+        "action_ref": null,
+        "note": "Initial balance snapshot.",
+        "payload": {
+          "source": "seed"
+        }
+      }
+    ]
+  },
+  "indexes": {
+    "agent_ids": [
+      "agent_scav_01"
+    ],
+    "sector_ids": [
+      "sector_0_0",
+      "sector_1_0",
+      "sector_2_0",
+      "sector_3_0",
+      "sector_4_0",
+      "sector_0_1",
+      "sector_1_1",
+      "sector_2_1",
+      "sector_3_1",
+      "sector_4_1",
+      "sector_0_2",
+      "sector_1_2",
+      "sector_2_2",
+      "sector_3_2",
+      "sector_4_2",
+      "sector_0_3",
+      "sector_1_3",
+      "sector_2_3",
+      "sector_3_3",
+      "sector_4_3",
+      "sector_0_4",
+      "sector_1_4",
+      "sector_2_4",
+      "sector_3_4",
+      "sector_4_4"
+    ],
+    "facility_ids": [
+      "facility_generator_00"
+    ],
+    "contract_ids": [
+      "contract_skill_install_01"
+    ],
+    "event_ids": [
+      "event_world_boot_01"
+    ],
+    "agents_by_owner_user_id": {
+      "user_demo_01": [
+        "agent_scav_01"
+      ]
+    },
+    "agents_by_location": {
+      "sector_0_0": [
+        "agent_scav_01"
+      ]
+    },
+    "facilities_by_sector_id": {
+      "sector_0_0": [
+        "facility_generator_00"
+      ]
+    },
+    "sectors_by_coordinate": {
+      "0,0": "sector_0_0",
+      "1,0": "sector_1_0",
+      "2,0": "sector_2_0",
+      "3,0": "sector_3_0",
+      "4,0": "sector_4_0",
+      "0,1": "sector_0_1",
+      "1,1": "sector_1_1",
+      "2,1": "sector_2_1",
+      "3,1": "sector_3_1",
+      "4,1": "sector_4_1",
+      "0,2": "sector_0_2",
+      "1,2": "sector_1_2",
+      "2,2": "sector_2_2",
+      "3,2": "sector_3_2",
+      "4,2": "sector_4_2",
+      "0,3": "sector_0_3",
+      "1,3": "sector_1_3",
+      "2,3": "sector_2_3",
+      "3,3": "sector_3_3",
+      "4,3": "sector_4_3",
+      "0,4": "sector_0_4",
+      "1,4": "sector_1_4",
+      "2,4": "sector_2_4",
+      "3,4": "sector_3_4",
+      "4,4": "sector_4_4"
+    },
+    "contracts_by_agent_id": {
+      "agent_scav_01": [
+        "contract_skill_install_01"
+      ]
+    },
+    "events_by_tick": {
+      "0": [
+        "event_world_boot_01"
+      ]
+    }
+  }
+}
