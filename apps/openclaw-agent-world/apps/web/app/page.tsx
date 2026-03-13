@@ -260,7 +260,7 @@ export default function HomePage() {
   return (
     <div className="max-w-7xl mx-auto px-6 py-12 space-y-24">
       {/* 第一屏：Hero + 双入口 */}
-      <section className="min-h-[60vh] flex flex-col justify-center items-center text-center space-y-12">
+      <section className="min-h-screen flex flex-col justify-center items-center text-center space-y-12 pt-20">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -321,13 +321,11 @@ export default function HomePage() {
 
       {/* 第三屏：世界动态播报 (Feed 流 + 横向 Tab 筛选) */}
       <section className="space-y-8 pb-24">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between border-b border-zinc-800 pb-4 gap-4">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between border-b border-zinc-800 pb-4 gap-2">
+          <div className="flex items-center gap-2">
             <Terminal className="w-6 h-6 text-amber-500" />
             <h2 className="text-xl lg:text-2xl font-black uppercase tracking-tighter text-zinc-100">世界动态播报</h2>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="industrial-border bg-zinc-900/50 p-2 lg:p-3 flex items-center gap-2 lg:gap-3 cursor-pointer hover:bg-zinc-800/30 transition-colors group w-full lg:w-96" onClick={() => setIsHistoryOpen(true)}>
+            <div className="industrial-border bg-zinc-900/50 p-2 lg:p-3 flex items-center gap-2 lg:gap-3 cursor-pointer hover:bg-zinc-800/30 transition-colors group flex-1 lg:flex-none lg:w-96" onClick={() => setIsHistoryOpen(true)}>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-amber-500 animate-pulse" />
                 <Badge color="amber" className="text-[9px] px-1.5 py-0.5">NEWS</Badge>
