@@ -266,12 +266,6 @@ export default function HomePage() {
           animate={{ opacity: 1, y: 0 }}
           className="space-y-4"
         >
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-amber-500 rounded-full flex items-center justify-center">
-              <span className="text-black text-[8px] font-bold">M</span>
-            </div>
-            <Badge>Powered by Monad</Badge>
-          </div>
           <h1 className="text-6xl md:text-8xl font-black tracking-tighter uppercase glitch-text">
             CLAW WORLD
           </h1>
@@ -327,18 +321,18 @@ export default function HomePage() {
 
       {/* 第三屏：世界动态播报 (Feed 流 + 横向 Tab 筛选) */}
       <section className="space-y-8 pb-24">
-        <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between border-b border-zinc-800 pb-4 gap-4">
           <div className="flex items-center gap-4">
             <Terminal className="w-6 h-6 text-amber-500" />
-            <h2 className="text-2xl font-black uppercase tracking-tighter text-zinc-100">世界动态播报</h2>
+            <h2 className="text-xl lg:text-2xl font-black uppercase tracking-tighter text-zinc-100">世界动态播报</h2>
           </div>
           <div className="flex items-center gap-4">
-            <div className="industrial-border bg-zinc-900/50 p-3 flex items-center gap-3 cursor-pointer hover:bg-zinc-800/30 transition-colors group w-96" onClick={() => setIsHistoryOpen(true)}>
+            <div className="industrial-border bg-zinc-900/50 p-2 lg:p-3 flex items-center gap-2 lg:gap-3 cursor-pointer hover:bg-zinc-800/30 transition-colors group w-full lg:w-96" onClick={() => setIsHistoryOpen(true)}>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-amber-500 animate-pulse" />
                 <Badge color="amber" className="text-[9px] px-1.5 py-0.5">NEWS</Badge>
               </div>
-              <div className="text-sm text-zinc-300 flex-1 line-clamp-1">
+              <div className="text-xs lg:text-sm text-zinc-300 flex-1 line-clamp-1">
                 {dynamicFeed.length > 0 ? (
                   // 过滤出重要的世界事件
                   dynamicFeed.find(event => 
@@ -556,10 +550,7 @@ export default function HomePage() {
           <div className="w-4 h-4 bg-amber-500 rounded-full flex items-center justify-center">
             <span className="text-black text-[8px] font-bold">M</span>
           </div>
-          <div className="flex items-center gap-2">
-            <Image src="/logo/monad.png" alt="Monad" className="h-4 w-auto" width={16} height={16} />
-            <span className="text-[10px] text-zinc-500 uppercase">Powered by Monad</span>
-          </div>
+          <span className="text-[10px] text-zinc-500 uppercase">Powered by Monad</span>
         </div>
         <p className="text-[10px] text-zinc-700 uppercase">© 2026 CLAW WORLD PROTOCOL. ALL RIGHTS RESERVED.</p>
       </footer>
