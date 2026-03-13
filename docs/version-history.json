@@ -1,0 +1,27 @@
+{
+  "current_version": "0.1.0",
+  "release_tag": "v0.1.0",
+  "history": [
+    {
+      "version": "v0.1.0-history.1",
+      "commit": "3cc2752c1d8fb58a2d347c933a448be4213bfc53",
+      "short_commit": "3cc2752",
+      "subject": "feat: bootstrap openclaw agent world with reviewed skill bridge",
+      "date": "2026-03-13"
+    },
+    {
+      "version": "v0.1.0-history.2",
+      "commit": "c95583c25a0024466b293bf4c24085fafcf4d299",
+      "short_commit": "c95583c",
+      "subject": "feat: add admin observability and platform control layers",
+      "date": "2026-03-13"
+    },
+    {
+      "version": "v0.1.0",
+      "commit": "73786aa90240728817e6462e841f8be522d55a5e",
+      "short_commit": "73786aa",
+      "subject": "feat: add release validation and recovery runbooks",
+      "date": "2026-03-13"
+    }
+  ]
+}
