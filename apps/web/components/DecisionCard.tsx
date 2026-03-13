@@ -1,5 +1,5 @@
-import { formatRiskLevel } from "@/lib/format";
-import type { DecisionCard as DecisionCardType } from "@/lib/types";
+import { formatRiskLevel } from "../lib/format";
+import type { DecisionCard as DecisionCardType } from "../lib/types";
 import { RiskBadge } from "./RiskBadge";
 
 type DecisionCardProps = {

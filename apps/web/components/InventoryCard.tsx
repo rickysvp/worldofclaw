@@ -1,4 +1,4 @@
-import type { InventoryItem } from "@/lib/types";
+import type { InventoryItem } from "../lib/types";
 
 type InventoryCardProps = {
   inventory: InventoryItem[];

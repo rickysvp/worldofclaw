@@ -1,4 +1,4 @@
-import type { WorldFeedEvent } from "@/lib/types";
+import type { WorldFeedEvent } from "../lib/types";
 import { EmptyState } from "./EmptyState";
 import { FeedItem } from "./FeedItem";
 

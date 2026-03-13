@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { DecisionCard as DecisionCardType } from "@/lib/types";
+import type { DecisionCard as DecisionCardType } from "../lib/types";
 import { RiskBadge } from "./RiskBadge";
 
 type DecisionDrawerProps = {

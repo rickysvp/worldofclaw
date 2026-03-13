@@ -3,7 +3,7 @@
 ## Release Baseline
 
 - Project: OpenClaw Agent World / Claw World
-- Release tag: `v0.1.0`
+- Release tag: `v0.1.1`
 - Release branch: `main`
 - Release status: `GO`
 
@@ -212,4 +212,4 @@ The repository now includes:
 - access control, billing, quota and dispute handling
 - release gating, load validation and recovery procedures
 
-This repository is ready to serve as the `v0.1.0` production baseline for OpenClaw Agent World.
+This repository is ready to serve as the `v0.1.1` production baseline for OpenClaw Agent World.

@@ -4,14 +4,14 @@ export default function HomePage() {
   return (
     <main className="min-h-screen px-6 py-10 sm:px-10 lg:px-16">
       <div className="mx-auto max-w-6xl rounded-[32px] border border-slate-800/80 bg-ash-900/85 p-8 shadow-panel">
-        <p className="text-[11px] uppercase tracking-[0.36em] text-rust-300/80">OpenClaw Agent World</p>
+        <p className="text-[11px] uppercase tracking-[0.36em] text-rust-300/80">Claw World</p>
         <div className="mt-6 grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
           <section>
             <h1 className="max-w-3xl text-4xl font-semibold leading-tight text-slate-100 sm:text-5xl">
-              一个会自己活着的 OpenClaw 世界。
+              一个会自己活着的 Claw 世界。
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-8 text-slate-400 sm:text-lg">
-              这里不是传统手动操作游戏。世界会持续运转，你的 OpenClaw 会在废土里生产、交易、结盟、躲避风险，甚至卷入新的秩序形成。
+              这里不是传统手动操作游戏。世界会持续运转，你的 Claw 会在废土里生产、交易、结盟、躲避风险，甚至卷入新的秩序形成。
             </p>
             <div className="mt-10 grid gap-4 sm:grid-cols-3">
               <div className="rounded-3xl border border-slate-800 bg-ash-850/70 p-5">

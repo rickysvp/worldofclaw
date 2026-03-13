@@ -1,15 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ClawStatusCard } from "@/components/ClawStatusCard";
-import { InventoryCard } from "@/components/InventoryCard";
-import { ObjectiveCard } from "@/components/ObjectiveCard";
-import { SectionHeader } from "@/components/SectionHeader";
-import { Sidebar } from "@/components/Sidebar";
-import { Topbar } from "@/components/Topbar";
-import { formatRelativeTime } from "@/lib/format";
-import { polling_interval_ms } from "@/lib/constants";
-import type { MyClawResponse } from "@/lib/types";
+import { ClawStatusCard } from "../../components/ClawStatusCard";
+import { InventoryCard } from "../../components/InventoryCard";
+import { ObjectiveCard } from "../../components/ObjectiveCard";
+import { SectionHeader } from "../../components/SectionHeader";
+import { Sidebar } from "../../components/Sidebar";
+import { Topbar } from "../../components/Topbar";
+import { formatRelativeTime } from "../../lib/format";
+import { polling_interval_ms } from "../../lib/constants";
+import type { MyClawResponse } from "../../lib/types";
 
 const fetchMyClaw = async (): Promise<MyClawResponse> => {
   const response = await fetch("/api/my-claw", { cache: "no-store" });

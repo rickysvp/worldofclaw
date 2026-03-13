@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getWorldFeed } from "@/lib/mock-data";
-import type { WorldFeedFilter } from "@/lib/types";
+import { getWorldFeed } from "../../../lib/mock-data";
+import type { WorldFeedFilter } from "../../../lib/types";
 
 export const dynamic = "force-dynamic";
 

@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { DecisionCard } from "@/components/DecisionCard";
-import { DecisionDrawer } from "@/components/DecisionDrawer";
-import { EmptyState } from "@/components/EmptyState";
-import { SectionHeader } from "@/components/SectionHeader";
-import { Sidebar } from "@/components/Sidebar";
-import { Topbar } from "@/components/Topbar";
-import { decision_views, polling_interval_ms } from "@/lib/constants";
-import type { DecisionCard as DecisionCardType, DecisionCardsResponse, DecisionView } from "@/lib/types";
+import { DecisionCard } from "../../components/DecisionCard";
+import { DecisionDrawer } from "../../components/DecisionDrawer";
+import { EmptyState } from "../../components/EmptyState";
+import { SectionHeader } from "../../components/SectionHeader";
+import { Sidebar } from "../../components/Sidebar";
+import { Topbar } from "../../components/Topbar";
+import { decision_views, polling_interval_ms } from "../../lib/constants";
+import type { DecisionCard as DecisionCardType, DecisionCardsResponse, DecisionView } from "../../lib/types";
 
 const fetchDecisionCards = async (): Promise<DecisionCardsResponse> => {
   const response = await fetch("/api/decision-cards", { cache: "no-store" });

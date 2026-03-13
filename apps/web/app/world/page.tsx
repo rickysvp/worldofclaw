@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { FeedList } from "@/components/FeedList";
-import { RiskBadge } from "@/components/RiskBadge";
-import { SectionHeader } from "@/components/SectionHeader";
-import { Sidebar } from "@/components/Sidebar";
-import { Topbar } from "@/components/Topbar";
-import { world_feed_filters, polling_interval_ms } from "@/lib/constants";
-import { formatRelativeTime } from "@/lib/format";
-import type { WorldFeedFilter, WorldFeedResponse } from "@/lib/types";
+import { FeedList } from "../../components/FeedList";
+import { RiskBadge } from "../../components/RiskBadge";
+import { SectionHeader } from "../../components/SectionHeader";
+import { Sidebar } from "../../components/Sidebar";
+import { Topbar } from "../../components/Topbar";
+import { world_feed_filters, polling_interval_ms } from "../../lib/constants";
+import { formatRelativeTime } from "../../lib/format";
+import type { WorldFeedFilter, WorldFeedResponse } from "../../lib/types";
 
 const fetchFeed = async (filter: WorldFeedFilter): Promise<WorldFeedResponse> => {
   const response = await fetch(`/api/world-feed?filter=${filter}`, { cache: "no-store" });

@@ -1,5 +1,5 @@
-import { formatRelativeTime } from "@/lib/format";
-import type { MockUserSession, WorldStatus } from "@/lib/types";
+import { formatRelativeTime } from "../lib/format";
+import type { MockUserSession, WorldStatus } from "../lib/types";
 
 type TopbarProps = {
   title: string;

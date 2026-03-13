@@ -1,5 +1,5 @@
-import { formatCredits } from "@/lib/format";
-import type { ClawState } from "@/lib/types";
+import { formatCredits } from "../lib/format";
+import type { ClawState } from "../lib/types";
 
 type ClawStatusCardProps = {
   claw: ClawState;

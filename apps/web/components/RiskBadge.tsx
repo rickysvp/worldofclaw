@@ -1,5 +1,5 @@
-import { formatRiskLevel } from "@/lib/format";
-import type { RiskLevel } from "@/lib/types";
+import { formatRiskLevel } from "../lib/format";
+import type { RiskLevel } from "../lib/types";
 
 type RiskBadgeProps = {
   level: RiskLevel;

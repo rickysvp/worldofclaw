@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { nav_items } from "@/lib/constants";
+import { nav_items } from "../lib/constants";
 
 type SidebarProps = {
   className?: string;

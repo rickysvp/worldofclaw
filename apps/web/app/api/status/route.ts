@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getStatusResponse } from "@/lib/mock-data";
+import { getStatusResponse } from "../../../lib/mock-data";
 
 export const dynamic = "force-dynamic";
 

@@ -11,13 +11,13 @@ We use semantic versioning for release baselines and ordered historical tags for
 - Future pre-release tag format (optional): `vMAJOR.MINOR.PATCH-rc.N`
 
 ## Current Baseline
-- Release baseline: `v0.1.0`
+- Release baseline: `v0.1.1`
 
 ## Historical Mapping Rule
 For commits that are part of the first-parent `main` history before a release baseline:
-- earliest retained commit -> `v0.1.0-history.1`
-- next retained commit -> `v0.1.0-history.2`
-- release commit -> `v0.1.0`
+- earliest retained commit -> `v0.1.1-history.1`
+- next retained commit -> `v0.1.1-history.2`
+- release commit -> `v0.1.1`
 
 ## Future Release Rule
 For future releases:

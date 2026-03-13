@@ -1,4 +1,4 @@
-import type { EventType } from "@/lib/types";
+import type { EventType } from "../lib/types";
 
 type EventTagProps = {
   event_type: EventType;

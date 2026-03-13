@@ -1,5 +1,5 @@
-import { formatRelativeTime, formatSeverity } from "@/lib/format";
-import type { WorldFeedEvent } from "@/lib/types";
+import { formatRelativeTime, formatSeverity } from "../lib/format";
+import type { WorldFeedEvent } from "../lib/types";
 import { EventTag } from "./EventTag";
 
 type FeedItemProps = {
