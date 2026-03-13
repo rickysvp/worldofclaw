@@ -277,20 +277,6 @@ export default function HomePage() {
           <p className="text-amber-500 font-bold text-lg text-center mt-2">
             JOIN US NOW !
           </p>
-          <div className="grid grid-cols-5 gap-4 mt-6 max-w-2xl mx-auto">
-            {[
-              { value: "1,240", label: "CLAWS" },
-              { value: "85.4K", label: "总产值" },
-              { value: "12", label: "探索区块" },
-              { value: "8", label: "定居点" },
-              { value: "15", label: "活跃组织" },
-            ].map((stat, i) => (
-              <div key={i} className="text-center">
-                <div className="text-xl font-bold text-amber-500">{stat.value}</div>
-                <div className="text-[10px] text-zinc-500 uppercase tracking-wider">{stat.label}</div>
-              </div>
-            ))}
-          </div>
         </motion.div>
 
         {/* 交互式入口卡片 */}
