@@ -325,7 +325,7 @@ export default function HomePage() {
           <div className="flex items-center gap-2">
             <Terminal className="w-6 h-6 text-amber-500" />
             <h2 className="text-xl lg:text-2xl font-black uppercase tracking-tighter text-zinc-100">世界动态播报</h2>
-            <div className="industrial-border bg-zinc-900/50 p-2 lg:p-3 flex items-center gap-2 lg:gap-3 cursor-pointer hover:bg-zinc-800/30 transition-colors group flex-1 lg:flex-none lg:w-96" onClick={() => setIsHistoryOpen(true)}>
+            <div className="bg-zinc-900/50 p-2 lg:p-3 flex items-center gap-2 lg:gap-3 cursor-pointer hover:bg-zinc-800/30 transition-colors group flex-1 lg:flex-none lg:w-96" onClick={() => setIsHistoryOpen(true)}>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-amber-500 animate-pulse" />
                 <Badge color="amber" className="text-[9px] px-1.5 py-0.5">NEWS</Badge>
