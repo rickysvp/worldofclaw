@@ -1,5 +1,15 @@
 export type ResourceType = 'ore' | 'scrap' | 'crystal';
-export type AgentType = 'miner' | 'maker' | 'trader';
+export type AgentType =
+  | 'miner'
+  | 'maker'
+  | 'trader'
+  | 'explorer'
+  | 'warrior'
+  | 'hacker'
+  | 'scout'
+  | 'guardian'
+  | 'spy'
+  | 'leader';
 export type LocationId = 'mine' | 'trading_post' | 'ruins_camp';
 
 export interface ResourceStack {

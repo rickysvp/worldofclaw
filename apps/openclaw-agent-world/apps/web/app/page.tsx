@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Globe, 
@@ -30,22 +30,22 @@ import {
   MOCK_LEAD_CLAWS
 } from '@/lib/mock-data';
 
+const ALL_EVENTS = [
+  ...MOCK_FEED_MODULES.market.map(e => ({ ...e, category: '市场' })),
+  ...MOCK_FEED_MODULES.conflict.map(e => ({ ...e, category: '冲突' })),
+  ...MOCK_FEED_MODULES.order.map(e => ({ ...e, category: '组织' })),
+].sort((a, b) => b.tick - a.tick);
+
 export default function HomePage() {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<'realtime' | 'mission' | 'market' | 'resource' | 'conflict' | 'risk' | 'organization'>('realtime');
   const [dynamicFeed, setDynamicFeed] = useState<any[]>([]);
 
-  const allEvents = useMemo(() => [
-    ...MOCK_FEED_MODULES.market.map(e => ({ ...e, category: '市场' })),
-    ...MOCK_FEED_MODULES.conflict.map(e => ({ ...e, category: '冲突' })),
-    ...MOCK_FEED_MODULES.order.map(e => ({ ...e, category: '组织' })),
-  ].sort((a, b) => b.tick - a.tick), [MOCK_FEED_MODULES]);
-
   // 动态生成新事件
   useEffect(() => {
     // 初始加载所有事件
-    setDynamicFeed(allEvents);
+    setDynamicFeed(ALL_EVENTS);
 
     // 每3秒生成一个新事件
     const interval = setInterval(() => {
@@ -234,7 +234,7 @@ export default function HomePage() {
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [allEvents]);
+  }, []);
 
   const tabs = [
     { id: 'realtime', label: '实时', icon: Terminal },
@@ -475,7 +475,7 @@ export default function HomePage() {
         title="世界动态历史记录"
       >
         <div className="space-y-6 p-2">
-          {allEvents.map((event) => (
+          {ALL_EVENTS.map((event) => (
             <div key={event.id} className="flex gap-4 border-b border-zinc-800 pb-4 last:border-0">
               <div className="text-[10px] tabular-nums text-zinc-600 font-bold w-12 pt-1">Tick {event.tick}</div>
               <div className="flex-1 space-y-1">

@@ -55,7 +55,7 @@ export default function InboxPage() {
               </div>
 
               <div className="p-4 bg-zinc-900/80 border-l-2 border-amber-500 text-sm text-zinc-300 leading-relaxed italic">
-                "{decision.description}"
+                &ldquo;{decision.description}&rdquo;
               </div>
 
               <div className="grid md:grid-cols-2 gap-4">
