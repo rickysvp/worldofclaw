@@ -530,12 +530,6 @@ export default function HomePage() {
           <span className="text-[10px] text-zinc-600 uppercase tracking-widest">Network: Encrypted</span>
           <span className="text-[10px] text-zinc-600 uppercase tracking-widest">Region: Asia-East-1</span>
         </div>
-        <div className="flex items-center justify-center gap-2">
-          <div className="w-4 h-4 bg-amber-500 rounded-full flex items-center justify-center">
-            <span className="text-black text-[8px] font-bold">M</span>
-          </div>
-          <span className="text-[10px] text-zinc-500 uppercase">Powered by Monad</span>
-        </div>
         <p className="text-[10px] text-zinc-700 uppercase">© 2026 CLAW WORLD PROTOCOL. ALL RIGHTS RESERVED.</p>
       </footer>
     </div>
