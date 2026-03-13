@@ -1,0 +1,347 @@
+version: 0.1.0
+
+decision_channels:
+  telegram_primary:
+    channel_id: telegram_primary
+    role: primary_human_approval_channel
+    delivery_mode: push_message_with_structured_actions
+    supports_responses:
+      - approve
+      - reject
+      - modify_quantity
+      - modify_budget_cap
+      - modify_route_risk
+    source_of_truth: decision_response_log
+  web_history_only:
+    channel_id: web_history_only
+    role: read_only_history_and_audit
+    delivery_mode: query_only
+    supports_responses: []
+    source_of_truth: decision_audit_view
+  internal_admin_console:
+    channel_id: internal_admin_console
+    role: operational_override_and_audit_review
+    delivery_mode: admin_console_panel
+    supports_responses:
+      - approve
+      - reject
+      - force_expire
+      - force_resume
+    source_of_truth: admin_decision_audit_log
+
+decision_types:
+  high_value_trade:
+    label: High Value Trade Approval
+    trigger_conditions:
+      - metric: estimated_credits_exposure
+        operator: gte
+        value: 500
+      - metric: trade_counterparty_risk
+        operator: in
+        value:
+          - medium
+          - high
+    required_snapshot_fields:
+      - runtime.id
+      - claw.id
+      - claw.credits
+      - claw.inventory
+      - trade.quote_id
+      - trade.counterparty
+      - trade.estimated_spend
+      - trade.estimated_receive
+      - world_tick
+    allowed_user_responses:
+      - approve
+      - reject
+      - modify_quantity
+      - modify_budget_cap
+    default_recommendation_strategy: recommend_reject_if_risk_high_and_margin_low
+    timeout_seconds: 900
+    timeout_behavior: reject_and_release_frozen_commitment
+    generates_command_type: execute_trade_decision
+    audit_requirements:
+      - snapshot_before_freeze
+      - approval_response_log
+      - frozen_commitment_ledger_entries
+      - settlement_trace
+
+  high_risk_route_change:
+    label: High Risk Route Change
+    trigger_conditions:
+      - metric: route_risk_score
+        operator: gte
+        value: 70
+      - metric: traverses_contested_sector
+        operator: eq
+        value: true
+    required_snapshot_fields:
+      - runtime.id
+      - claw.id
+      - claw.current_sector
+      - route.original_path
+      - route.proposed_path
+      - route.estimated_power_cost
+      - route.risk_breakdown
+      - world_tick
+    allowed_user_responses:
+      - approve
+      - reject
+      - modify_route_risk
+    default_recommendation_strategy: recommend_alternate_route_if_available
+    timeout_seconds: 600
+    timeout_behavior: keep_original_route
+    generates_command_type: apply_route_change
+    audit_requirements:
+      - route_snapshot
+      - decision_delivery_record
+      - command_outbox_record
+
+  dangerous_escort:
+    label: Dangerous Escort Contract
+    trigger_conditions:
+      - metric: escort_threat_score
+        operator: gte
+        value: 75
+      - metric: contract_value
+        operator: gte
+        value: 300
+    required_snapshot_fields:
+      - runtime.id
+      - claw.id
+      - escort.route
+      - escort.client_id
+      - escort.reward
+      - escort.hostile_density
+      - world_tick
+    allowed_user_responses:
+      - approve
+      - reject
+      - modify_route_risk
+      - modify_budget_cap
+    default_recommendation_strategy: recommend_approve_if_reward_covers_loss_threshold
+    timeout_seconds: 900
+    timeout_behavior: reject_contract
+    generates_command_type: execute_escort_contract
+    audit_requirements:
+      - contract_snapshot
+      - approval_chain
+      - outcome_report
+
+  rare_resource_commit:
+    label: Rare Resource Commitment
+    trigger_conditions:
+      - metric: rare_resource_quantity
+        operator: gte
+        value: 1
+      - metric: resource_type
+        operator: in
+        value:
+          - xenite
+          - compute_core
+    required_snapshot_fields:
+      - runtime.id
+      - claw.id
+      - claw.inventory
+      - resource_batch_ids
+      - target_use_case
+      - world_tick
+    allowed_user_responses:
+      - approve
+      - reject
+      - modify_quantity
+    default_recommendation_strategy: recommend_hold_if_market_volatility_high
+    timeout_seconds: 1200
+    timeout_behavior: hold_resource_and_notify
+    generates_command_type: commit_rare_resource
+    audit_requirements:
+      - resource_batch_trace
+      - commitment_ledger_record
+      - response_log
+
+  faction_alignment:
+    label: Faction Alignment Decision
+    trigger_conditions:
+      - metric: proposed_alignment_change
+        operator: eq
+        value: true
+      - metric: organization_type
+        operator: in
+        value:
+          - outpost
+          - faction
+    required_snapshot_fields:
+      - runtime.id
+      - claw.id
+      - claw.organization
+      - proposed_organization_id
+      - trust_summary
+      - hostility_summary
+      - world_tick
+    allowed_user_responses:
+      - approve
+      - reject
+    default_recommendation_strategy: recommend_join_if_trust_positive_and_conflict_low
+    timeout_seconds: 1800
+    timeout_behavior: remain_unaligned
+    generates_command_type: apply_faction_alignment
+    audit_requirements:
+      - relation_snapshot
+      - organization_snapshot
+      - decision_audit_log
+
+  vault_withdrawal:
+    label: Vault Withdrawal Approval
+    trigger_conditions:
+      - metric: withdrawal_quantity
+        operator: gte
+        value: 1
+    required_snapshot_fields:
+      - runtime.id
+      - claw.id
+      - vault.balance
+      - withdrawal_quantity
+      - settlement_epoch
+      - world_tick
+    allowed_user_responses:
+      - approve
+      - reject
+      - modify_quantity
+    default_recommendation_strategy: recommend_reject_if_balance_below_reserve_floor
+    timeout_seconds: 600
+    timeout_behavior: keep_funds_in_vault
+    generates_command_type: execute_vault_withdrawal
+    audit_requirements:
+      - vault_snapshot
+      - frozen_commitment_record
+      - settlement_mapping_record
+
+  emergency_shutdown_override:
+    label: Emergency Shutdown Override
+    trigger_conditions:
+      - metric: runtime_state
+        operator: eq
+        value: failed_recovery
+      - metric: manual_override_requested
+        operator: eq
+        value: true
+    required_snapshot_fields:
+      - runtime.id
+      - runtime.status
+      - recovery_attempts
+      - failure_reason
+      - world_tick
+    allowed_user_responses:
+      - approve
+      - reject
+    default_recommendation_strategy: recommend_reject_if_snapshot_missing
+    timeout_seconds: 300
+    timeout_behavior: preserve_shutdown_and_alert_admin
+    generates_command_type: execute_shutdown_override
+    audit_requirements:
+      - recovery_snapshot
+      - command_outbox_record
+      - post_action_verification
+
+default_timeout_rules:
+  low_risk_notify_only:
+    timeout_seconds: 0
+    timeout_behavior: auto_continue
+  medium_risk_notify_without_block:
+    timeout_seconds: 300
+    timeout_behavior: continue_with_recommended_action
+  high_risk_blocking:
+    timeout_seconds: 900
+    timeout_behavior: reject_and_release_frozen_commitment
+
+policies:
+  low_risk_bypass:
+    description: low risk actions do not enter telegram approval
+    applies_when:
+      - risk_level: low
+      - approval_required: false
+    behavior:
+      decision_created: false
+      telegram_delivery: false
+      command_outbox_write: false
+
+  medium_risk_notify_only:
+    description: medium risk actions notify user but do not block runtime by default
+    applies_when:
+      - risk_level: medium
+      - approval_required: false
+      - notify_user: true
+    behavior:
+      decision_created: true
+      delivery_channel: telegram_primary
+      blocks_runtime: false
+      timeout_behavior: continue_with_recommended_action
+      command_outbox_target: web_history_only
+
+  high_risk_block_and_wait:
+    description: high risk actions block the relevant action path and wait for user approval
+    applies_when:
+      - risk_level: high
+      - approval_required: true
+    behavior:
+      decision_created: true
+      delivery_channel: telegram_primary
+      blocks_runtime: true
+      freeze_resources: true
+      snapshot_required: true
+      timeout_behavior: reject_and_release_frozen_commitment
+      command_outbox_target: command_outbox
+
+  expired_decision_handling:
+    description: expired decisions must produce an auditable fallback result
+    applies_when:
+      - decision_status: expired
+    behavior:
+      write_decision_event: true
+      write_audit_log: true
+      write_command_outbox: true
+      requires_correlation_id: true
+
+  command_outbox_delivery:
+    description: approved or modified decisions become structured commands for runtime pickup
+    applies_when:
+      - decision_status:
+          - approved
+          - modified
+    behavior:
+      writes_command_outbox: true
+      command_fields:
+        - decision_id
+        - command_type
+        - runtime_id
+        - claw_id
+        - approval_payload
+        - correlation_id
+        - expires_at
+      delivery_guarantee: at_least_once_with_idempotency_key
+
+examples:
+  - rule_id: ex_high_value_trade_block
+    decision_type: high_value_trade
+    scenario: claw proposes selling 12 xenite for 860 credits to a high-volatility buyer
+    outcome: freeze_trade_inventory_and_wait_for_telegram_approval
+
+  - rule_id: ex_route_change_notify
+    decision_type: high_risk_route_change
+    scenario: route enters one contested sector but alternate path remains available
+    outcome: telegram_notify_with_recommended_safe_route
+
+  - rule_id: ex_rare_resource_commit
+    decision_type: rare_resource_commit
+    scenario: claw wants to commit 1 compute_core to an organization build request
+    outcome: block_commit_and_request_user_confirmation
+
+  - rule_id: ex_vault_withdrawal
+    decision_type: vault_withdrawal
+    scenario: user requests withdrawal of 400 credits from vault reserve
+    outcome: create_decision_freeze_amount_and_wait_for_approval
+
+  - rule_id: ex_shutdown_override
+    decision_type: emergency_shutdown_override
+    scenario: runtime recovery failed twice and user is asked whether to override shutdown
+    outcome: telegram_blocking_decision_with_admin_audit

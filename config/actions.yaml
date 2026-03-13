@@ -1,0 +1,618 @@
+version: 0.1.0
+
+action_groups:
+  mobility:
+    label: mobility
+    description: sector traversal and route adjustments
+  observation:
+    label: observation
+    description: world inspection and low-risk information gathering
+  economy:
+    label: economy
+    description: trade, vault, and market-facing commitments
+  maintenance:
+    label: maintenance
+    description: power, repair, and runtime upkeep actions
+  industry:
+    label: industry
+    description: refining, building, and installation work
+  control:
+    label: control
+    description: ownership, claim, escort, and contract alignment actions
+
+shared_fields:
+  id:
+    type: string
+    required: true
+  label:
+    type: string
+    required: true
+  category:
+    type: enum
+    required: true
+  actor_type:
+    type: enum
+    required: true
+    allowed_values: [runtime, claw, organization, facility]
+  target_type:
+    type: enum
+    required: false
+    allowed_values: [sector, facility, runtime, claw, organization, vault, contract, none]
+  prerequisites:
+    type: list
+    required: true
+  consumes:
+    type: list
+    required: true
+  produces:
+    type: list
+    required: true
+  state_changes:
+    type: list
+    required: true
+  success_rules:
+    type: list
+    required: true
+  failure_rules:
+    type: list
+    required: true
+  risk_level:
+    type: enum
+    required: true
+    allowed_values: [low, medium, high, critical]
+  approval_required:
+    type: boolean
+    required: true
+  approval_policy:
+    type: enum
+    required: true
+    allowed_values: [none, notify_only, telegram_blocking, admin_override_only]
+  fallback_on_timeout:
+    type: enum
+    required: true
+    allowed_values: [continue, cancel, conservative_route, hold_position, rollback_frozen, admin_escalation]
+  emits_events:
+    type: list
+    required: true
+  ledger_tags:
+    type: list
+    required: true
+  cooldown_ticks:
+    type: integer
+    required: true
+
+actions:
+  move:
+    id: move
+    label: move
+    category: mobility
+    actor_type: runtime
+    target_type: sector
+    prerequisites:
+      - actor.status in [active, resumed]
+      - actor.power >= 1
+      - target_sector.is_adjacent == true
+      - target_sector.blocked == false
+      - actor.not_frozen_for_high_risk_action == true
+    consumes:
+      - resource_type: power
+        quantity: 1
+    produces:
+      - resource_type: none
+        quantity: 0
+    state_changes:
+      - actor.current_sector <- target_sector.id
+      - actor.last_route_risk <- computed_route_risk
+    success_rules:
+      - apply_sector_change
+      - emit_move_completed
+    failure_rules:
+      - if power_insufficient then fail_action
+      - if target_invalid then fail_action
+    risk_level: low
+    approval_required: false
+    approval_policy: none
+    fallback_on_timeout: continue
+    emits_events: [runtime.move.started, runtime.move.completed, runtime.move.failed]
+    ledger_tags: [action_cost.power, mobility.move]
+    cooldown_ticks: 1
+
+  scan:
+    id: scan
+    label: scan
+    category: observation
+    actor_type: runtime
+    target_type: sector
+    prerequisites:
+      - actor.status in [active, resumed]
+      - actor.power >= 1
+    consumes:
+      - resource_type: power
+        quantity: 1
+    produces:
+      - resource_type: intel
+        quantity: 1
+    state_changes:
+      - actor.last_scan_tick <- world_tick
+      - actor.visible_snapshot <- target_sector.public_state
+    success_rules:
+      - add_scan_summary
+      - refresh_nearby_feed_context
+    failure_rules:
+      - if power_insufficient then fail_action
+    risk_level: low
+    approval_required: false
+    approval_policy: none
+    fallback_on_timeout: continue
+    emits_events: [runtime.scan.completed, runtime.scan.failed]
+    ledger_tags: [action_cost.power, observation.scan]
+    cooldown_ticks: 1
+
+  salvage:
+    id: salvage
+    label: salvage
+    category: industry
+    actor_type: runtime
+    target_type: sector
+    prerequisites:
+      - actor.status in [active, resumed]
+      - actor.power >= 1
+      - target_sector.salvage_available == true
+      - actor.cargo_remaining > 0
+    consumes:
+      - resource_type: power
+        quantity: 1
+    produces:
+      - resource_type: scrap
+        quantity: variable_from_salvage_table
+    state_changes:
+      - actor.cargo_used += produced_quantity
+      - sector.salvage_yield_remaining -= produced_quantity
+    success_rules:
+      - transfer_resource_batch_from_sector_to_runtime
+      - append_resource_batch_entries
+    failure_rules:
+      - if target_depleted then fail_action
+      - if cargo_full then fail_action
+    risk_level: low
+    approval_required: false
+    approval_policy: none
+    fallback_on_timeout: continue
+    emits_events: [runtime.salvage.completed, runtime.salvage.failed]
+    ledger_tags: [action_cost.power, action_reward.scrap, resource_batch]
+    cooldown_ticks: 1
+
+  charge:
+    id: charge
+    label: charge
+    category: maintenance
+    actor_type: runtime
+    target_type: facility
+    prerequisites:
+      - actor.status in [active, resumed]
+      - target_facility.type == generator or target_facility.type == relay
+      - target_facility.access_granted == true
+      - actor.credits >= quoted_service_fee
+    consumes:
+      - resource_type: credits
+        quantity: quoted_service_fee
+    produces:
+      - resource_type: power
+        quantity: service_quote.power_out
+    state_changes:
+      - actor.power += service_quote.power_out
+      - facility.available_power -= service_quote.power_out
+    success_rules:
+      - execute_service_settlement
+      - enforce_credit_and_facility_split
+    failure_rules:
+      - if access_denied then fail_action
+      - if service_unavailable then fail_action
+    risk_level: low
+    approval_required: false
+    approval_policy: none
+    fallback_on_timeout: continue
+    emits_events: [runtime.charge.completed, runtime.charge.failed, economy.service_settlement]
+    ledger_tags: [action_cost.credits, action_reward.power, treasury_flow, trade_settlement]
+    cooldown_ticks: 1
+
+  trade:
+    id: trade
+    label: trade
+    category: economy
+    actor_type: runtime
+    target_type: facility
+    prerequisites:
+      - actor.status in [active, resumed]
+      - market_quote.exists == true
+      - target_market.access_granted == true
+      - requested_quantity > 0
+    consumes:
+      - resource_type: resource_or_credits
+        quantity: quote_bounded_quantity
+    produces:
+      - resource_type: credits_or_resource
+        quantity: quote_bounded_quantity
+    state_changes:
+      - actor.inventory adjusted by settlement result
+      - market.quote_depth adjusted by settlement result
+    success_rules:
+      - if trade_value < auto_trade_threshold then settle_immediately
+      - if trade_value >= auto_trade_threshold or quote.risk == high then write_frozen_commitment
+    failure_rules:
+      - if quote_expired then fail_action
+      - if balance_insufficient then fail_action
+      - if approval_rejected then rollback_frozen_commitment
+    risk_level: medium
+    approval_required: conditional
+    approval_policy: telegram_blocking
+    fallback_on_timeout: rollback_frozen
+    emits_events: [economy.trade.requested, economy.trade.frozen, economy.trade.settled, economy.trade.failed]
+    ledger_tags: [trade_settlement, frozen_commitment, treasury_flow, action_reward, action_cost]
+    cooldown_ticks: 1
+
+  repair:
+    id: repair
+    label: repair
+    category: maintenance
+    actor_type: runtime
+    target_type: facility
+    prerequisites:
+      - actor.status in [active, resumed, degraded]
+      - actor.durability < actor.durability_max
+      - target_facility.type in [workshop, shelter]
+      - actor.credits >= quoted_service_fee
+    consumes:
+      - resource_type: credits
+        quantity: quoted_service_fee
+    produces:
+      - resource_type: durability
+        quantity: service_quote.durability_out
+    state_changes:
+      - actor.durability += service_quote.durability_out
+      - facility.repair_capacity -= service_quote.durability_out
+    success_rules:
+      - execute_service_settlement
+      - append_repair_action_reward
+    failure_rules:
+      - if service_unavailable then fail_action
+      - if quoted_fee_unaffordable then fail_action
+    risk_level: low
+    approval_required: false
+    approval_policy: none
+    fallback_on_timeout: continue
+    emits_events: [runtime.repair.completed, runtime.repair.failed, economy.service_settlement]
+    ledger_tags: [action_cost.credits, action_reward.durability, treasury_flow]
+    cooldown_ticks: 1
+
+  refine:
+    id: refine
+    label: refine
+    category: industry
+    actor_type: runtime
+    target_type: facility
+    prerequisites:
+      - actor.status in [active, resumed]
+      - target_facility.type == refinery
+      - actor.inventory.xenite >= 2
+      - actor.inventory.circuit >= 1
+      - actor.power >= 2
+      - actor.credits >= quoted_service_fee
+    consumes:
+      - resource_type: xenite
+        quantity: 2
+      - resource_type: circuit
+        quantity: 1
+      - resource_type: power
+        quantity: 2
+      - resource_type: credits
+        quantity: quoted_service_fee
+    produces:
+      - resource_type: compute_core
+        quantity: 1_on_success
+    state_changes:
+      - actor.inventory.compute_core += 1_on_success
+      - actor.power -= 2
+    success_rules:
+      - execute_refinery_recipe_with_success_rate
+      - execute_service_settlement
+    failure_rules:
+      - if recipe_failed then consume_inputs_and_emit_failure
+      - if service_unavailable then fail_action
+    risk_level: medium
+    approval_required: false
+    approval_policy: none
+    fallback_on_timeout: continue
+    emits_events: [runtime.refine.completed, runtime.refine.failed, economy.service_settlement]
+    ledger_tags: [action_cost.resource, action_cost.credits, action_reward.compute_core, treasury_flow]
+    cooldown_ticks: 2
+
+  build:
+    id: build
+    label: build
+    category: industry
+    actor_type: runtime
+    target_type: sector
+    prerequisites:
+      - actor.status in [active, resumed]
+      - target_sector.build_allowed == true
+      - target_sector.empty_facility_slot_count > 0
+      - actor.inventory.scrap >= build_recipe.scrap
+      - actor.credits >= build_recipe.credits
+    consumes:
+      - resource_type: scrap
+        quantity: recipe_defined
+      - resource_type: credits
+        quantity: recipe_defined
+    produces:
+      - resource_type: facility
+        quantity: 1
+    state_changes:
+      - sector.facility_count += 1
+      - facility.owner_runtime_id <- actor.runtime_id
+    success_rules:
+      - create_facility_record
+      - assign_initial_control_claim
+    failure_rules:
+      - if slot_unavailable then fail_action
+      - if permission_denied then fail_action
+    risk_level: medium
+    approval_required: conditional
+    approval_policy: telegram_blocking
+    fallback_on_timeout: hold_position
+    emits_events: [facility.build.requested, facility.build.completed, facility.build.failed]
+    ledger_tags: [action_cost.resource, action_cost.credits, facility_yield]
+    cooldown_ticks: 4
+
+  claim:
+    id: claim
+    label: claim
+    category: control
+    actor_type: runtime
+    target_type: facility
+    prerequisites:
+      - actor.status in [active, resumed]
+      - target_facility.claimable == true
+      - target_facility.disabled == false
+      - actor.access_to_sector == true
+    consumes:
+      - resource_type: power
+        quantity: 1
+    produces:
+      - resource_type: control_right
+        quantity: 1
+    state_changes:
+      - facility.owner_runtime_id <- actor.runtime_id
+      - facility.claimed_at_tick <- world_tick
+    success_rules:
+      - transfer_control_and_emit_claim
+      - sync_sector_control_candidate
+    failure_rules:
+      - if contested_claim_rejected then rollback_control_transfer
+      - if facility_protected then fail_action
+    risk_level: high
+    approval_required: true
+    approval_policy: telegram_blocking
+    fallback_on_timeout: hold_position
+    emits_events: [facility.claim.requested, facility.claim.completed, facility.claim.failed]
+    ledger_tags: [frozen_commitment, facility_yield, action_cost.power]
+    cooldown_ticks: 4
+
+  escort:
+    id: escort
+    label: escort
+    category: control
+    actor_type: runtime
+    target_type: contract
+    prerequisites:
+      - actor.status in [active, resumed]
+      - contract.type == escort
+      - route.exists == true
+      - actor.power >= required_power
+    consumes:
+      - resource_type: power
+        quantity: route_cost
+    produces:
+      - resource_type: credits_or_bond
+        quantity: contract_defined
+    state_changes:
+      - actor.route_lock <- contract.route_id
+      - actor.risk_posture <- contract.risk_profile
+    success_rules:
+      - if route_risk <= medium and contract_value < threshold then auto_execute
+      - otherwise freeze_contract_commitment
+    failure_rules:
+      - if route_turns_critical then request_decision
+      - if approval_timeout then conservative_route
+    risk_level: high
+    approval_required: true
+    approval_policy: telegram_blocking
+    fallback_on_timeout: conservative_route
+    emits_events: [runtime.escort.requested, runtime.escort.frozen, runtime.escort.completed, runtime.escort.failed]
+    ledger_tags: [frozen_commitment, action_cost.power, action_reward.credits]
+    cooldown_ticks: 3
+
+  accept_contract:
+    id: accept_contract
+    label: accept_contract
+    category: control
+    actor_type: runtime
+    target_type: contract
+    prerequisites:
+      - actor.status in [active, resumed]
+      - contract.status == open
+      - contract.access_granted == true
+    consumes:
+      - resource_type: none
+        quantity: 0
+    produces:
+      - resource_type: contract_commitment
+        quantity: 1
+    state_changes:
+      - contract.status <- accepted
+      - actor.active_contract_id <- contract.id
+    success_rules:
+      - if contract.risk_level <= medium then auto_accept
+      - otherwise freeze_contract_acceptance
+    failure_rules:
+      - if contract_expired then fail_action
+      - if approval_rejected then restore_contract_open
+    risk_level: medium
+    approval_required: conditional
+    approval_policy: telegram_blocking
+    fallback_on_timeout: cancel
+    emits_events: [contract.accept.requested, contract.accept.completed, contract.accept.failed]
+    ledger_tags: [frozen_commitment]
+    cooldown_ticks: 1
+
+  route_change:
+    id: route_change
+    label: route_change
+    category: mobility
+    actor_type: runtime
+    target_type: sector
+    prerequisites:
+      - actor.route_lock == true
+      - new_route.exists == true
+      - actor.status in [active, resumed]
+    consumes:
+      - resource_type: none
+        quantity: 0
+    produces:
+      - resource_type: route_commitment
+        quantity: 1
+    state_changes:
+      - actor.current_route <- new_route.id
+      - actor.route_risk <- new_route.risk_level
+    success_rules:
+      - if new_route.risk_level == low then apply_immediately
+      - if new_route.risk_level >= medium then freeze_route_change
+    failure_rules:
+      - if route_unreachable then fail_action
+      - if approval_timeout then hold_position
+    risk_level: high
+    approval_required: true
+    approval_policy: telegram_blocking
+    fallback_on_timeout: hold_position
+    emits_events: [runtime.route_change.requested, runtime.route_change.approved, runtime.route_change.failed]
+    ledger_tags: [frozen_commitment]
+    cooldown_ticks: 1
+
+  install_core:
+    id: install_core
+    label: install_core
+    category: industry
+    actor_type: runtime
+    target_type: runtime
+    prerequisites:
+      - actor.inventory.compute_core >= 1
+      - actor.status in [active, resumed, degraded]
+    consumes:
+      - resource_type: compute_core
+        quantity: 1
+      - resource_type: power
+        quantity: 2
+    produces:
+      - resource_type: compute_capacity
+        quantity: 1_upgrade
+    state_changes:
+      - actor.compute_max += computed_upgrade
+      - actor.last_core_install_tick <- world_tick
+    success_rules:
+      - apply_core_upgrade
+      - append_runtime_upgrade_log
+    failure_rules:
+      - if actor_degraded_beyond_safe_threshold then request_approval
+      - if install_failed then consume_inputs_and_emit_failure
+    risk_level: high
+    approval_required: true
+    approval_policy: telegram_blocking
+    fallback_on_timeout: cancel
+    emits_events: [runtime.install_core.requested, runtime.install_core.completed, runtime.install_core.failed]
+    ledger_tags: [action_cost.resource, action_reward.runtime_upgrade, frozen_commitment]
+    cooldown_ticks: 6
+
+  deposit_to_vault:
+    id: deposit_to_vault
+    label: deposit_to_vault
+    category: economy
+    actor_type: user
+    target_type: vault
+    prerequisites:
+      - user.wallet_linked == true
+      - requested_quantity > 0
+    consumes:
+      - resource_type: credits_or_chain_asset
+        quantity: requested_quantity
+    produces:
+      - resource_type: vault_balance
+        quantity: requested_quantity
+    state_changes:
+      - vault.user_balance += requested_quantity
+    success_rules:
+      - record_chain_settlement_mapping_if_onchain
+      - finalize_vault_balance_entry
+    failure_rules:
+      - if chain_or_fiat_entry_failed then fail_action
+    risk_level: medium
+    approval_required: false
+    approval_policy: none
+    fallback_on_timeout: continue
+    emits_events: [vault.deposit.requested, vault.deposit.completed, vault.deposit.failed]
+    ledger_tags: [treasury_flow, chain_settlement_mapping]
+    cooldown_ticks: 1
+
+  withdraw_from_vault:
+    id: withdraw_from_vault
+    label: withdraw_from_vault
+    category: economy
+    actor_type: user
+    target_type: vault
+    prerequisites:
+      - user.wallet_linked == true
+      - vault.user_balance >= requested_quantity
+      - requested_quantity > 0
+    consumes:
+      - resource_type: vault_balance
+        quantity: requested_quantity
+    produces:
+      - resource_type: credits_or_chain_asset
+        quantity: requested_quantity
+    state_changes:
+      - vault.user_balance -= requested_quantity
+    success_rules:
+      - create_frozen_withdrawal_commitment
+      - require_approval_for_large_or_flagged_withdrawal
+      - finalize_chain_settlement_mapping_on_success
+    failure_rules:
+      - if approval_rejected then restore_vault_balance
+      - if settlement_failed then rollback_frozen_commitment
+    risk_level: high
+    approval_required: true
+    approval_policy: telegram_blocking
+    fallback_on_timeout: rollback_frozen
+    emits_events: [vault.withdraw.requested, vault.withdraw.frozen, vault.withdraw.completed, vault.withdraw.failed]
+    ledger_tags: [frozen_commitment, treasury_flow, chain_settlement_mapping]
+    cooldown_ticks: 1
+
+action_design_notes:
+  automatic_by_default:
+    - move
+    - scan
+    - salvage
+    - charge
+    - repair
+  notify_only_candidates:
+    - refine when service_fee <= low_fee_threshold and target_facility is trusted
+    - accept_contract when contract_value is low and route_risk is low
+  must_require_human_confirmation:
+    - trade when trade_value >= high_value_threshold
+    - route_change when route_risk >= medium
+    - escort when conflict_probability >= medium
+    - claim
+    - install_core
+    - withdraw_from_vault
+  approval_principle:
+    - low risk actions default to automatic execution
+    - medium risk actions may notify without blocking when policy says notify_only
+    - high risk and critical actions must enter Telegram approval flow

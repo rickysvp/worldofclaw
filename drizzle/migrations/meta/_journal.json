@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1773389318408,
+      "tag": "0000_curved_boom_boom",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1773397200000,
+      "tag": "0001_stage3_statuses",
+      "breakpoints": true
+    }
+  ]
+}

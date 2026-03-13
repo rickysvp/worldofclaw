@@ -1,0 +1,313 @@
+version: 0.1.0
+
+ledger_domains:
+  resource_balance:
+    description: running balance for fungible resources by owner
+  resource_batch:
+    description: provenance-tracked batches for salvage, refine, and rare items
+  action_cost:
+    description: costs paid when an action starts or completes
+  action_reward:
+    description: rewards granted when an action succeeds
+  trade_settlement:
+    description: trade-side balance transfers after settlement
+  facility_yield:
+    description: facility production and maintenance yield or drain
+  treasury_flow:
+    description: platform, organization, vault, and service fee movement
+  frozen_commitment:
+    description: resources reserved while waiting for approval
+  chain_settlement_mapping:
+    description: linkage between chainless ledger entries and chain settlement_epoch records
+
+entities:
+  user:
+    primary_key: user_id
+    description: human account owner
+  runtime:
+    primary_key: runtime_id
+    description: active runtime session identity
+  claw:
+    primary_key: claw_id
+    description: long-lived claw identity
+  organization:
+    primary_key: organization_id
+    description: emergent group treasury and control entity
+  facility:
+    primary_key: facility_id
+    description: buildable, claimable world facility
+  sector:
+    primary_key: sector_id
+    description: location-scoped world entity
+  vault:
+    primary_key: vault_id
+    description: custodial asset entry and withdrawal ledger scope
+  settlement_epoch:
+    primary_key: settlement_epoch_id
+    description: chain-side settlement grouping boundary
+
+entry_types:
+  debit:
+    sign: negative
+    finalizable: true
+  credit:
+    sign: positive
+    finalizable: true
+  reserve:
+    sign: negative_available_positive_frozen
+    finalizable: false
+  release:
+    sign: positive_available_negative_frozen
+    finalizable: true
+  finalize:
+    sign: no_balance_change_expected_when_following_reserve
+    finalizable: true
+  rollback:
+    sign: inverse_of_reserved_flow
+    finalizable: true
+  batch_open:
+    sign: informational
+    finalizable: true
+  batch_consume:
+    sign: negative_batch_quantity
+    finalizable: true
+  anchor:
+    sign: informational
+    finalizable: true
+
+common_fields:
+  entry_id:
+    type: string
+    required: true
+  domain:
+    type: enum
+    required: true
+    values:
+      - resource_balance
+      - resource_batch
+      - action_cost
+      - action_reward
+      - trade_settlement
+      - facility_yield
+      - treasury_flow
+      - frozen_commitment
+      - chain_settlement_mapping
+  entry_type:
+    type: enum
+    required: true
+    values: [debit, credit, reserve, release, finalize, rollback, batch_open, batch_consume, anchor]
+  owner_type:
+    type: enum
+    required: true
+    values: [user, runtime, claw, organization, facility, sector, vault, settlement_epoch]
+  owner_id:
+    type: string
+    required: true
+  counterparty_type:
+    type: enum
+    required: false
+    values: [user, runtime, claw, organization, facility, sector, vault, settlement_epoch, none]
+  counterparty_id:
+    type: string
+    required: false
+  resource_type:
+    type: string
+    required: true
+  quantity:
+    type: integer
+    required: true
+  unit:
+    type: string
+    required: true
+    default: units
+  source_type:
+    type: enum
+    required: true
+    values: [action, event, decision, service, trade, facility_cycle, snapshot, chain_anchor, admin]
+  source_id:
+    type: string
+    required: true
+  caused_by_action:
+    type: string
+    required: false
+  caused_by_event:
+    type: string
+    required: false
+  decision_id:
+    type: string
+    required: false
+  session_id:
+    type: string
+    required: false
+  world_tick:
+    type: integer
+    required: true
+  status:
+    type: enum
+    required: true
+    values: [pending, frozen, approved, rejected, finalized, rolled_back, anchored]
+  created_at:
+    type: timestamp
+    required: true
+  finalized_at:
+    type: timestamp
+    required: false
+  metadata:
+    type: object
+    required: true
+
+lifecycle_rules:
+  frozen_resource_recording:
+    - create reserve entries in frozen_commitment when a high-risk action starts
+    - reserve entries must reduce available quantity and increase frozen quantity in metadata
+    - reserve entries must reference decision_id and snapshot.snapshot_id
+  approval_promotion:
+    - when approval is granted, write finalize entries that point back to the reserve entry_id
+    - settlement-bearing approvals must also create action_cost, action_reward, trade_settlement, or treasury_flow entries
+    - finalized entries must set finalized_at
+  approval_rejection_rollback:
+    - when approval is rejected, write rollback entries that restore the reserved quantity to available balance
+    - rollback entries must reference the original reserve entry_id in metadata.reserve_entry_id
+    - rejected decisions must leave no remaining frozen balance for the same source_id
+  batch_tracking:
+    - salvage and rare resource acquisition must open a resource_batch entry with metadata.batch_id
+    - refine, trade, install_core, and build actions must consume batches by metadata.input_batch_ids
+    - output batches must keep metadata.origin_batch_ids for provenance tracing
+  chain_mapping:
+    - every chain-relevant transfer must write a chain_settlement_mapping entry with metadata.settlement_epoch_id
+    - mapping entries bind one or more ledger entry_id values to one settlement_epoch_id
+    - mapping entries remain pending until onchain proof or tx hash is confirmed
+  anchor_candidates:
+    - frozen_commitment finalize entries
+    - trade_settlement entries above high_value_threshold
+    - treasury_flow entries tied to vault withdraw or prize distribution
+    - settlement_epoch summary hashes
+
+retention_rules:
+  resource_balance:
+    retain: permanent
+  resource_batch:
+    retain: permanent
+  action_cost:
+    retain: permanent
+  action_reward:
+    retain: permanent
+  trade_settlement:
+    retain: permanent
+  facility_yield:
+    retain: 365d_plus_archive
+  treasury_flow:
+    retain: permanent
+  frozen_commitment:
+    retain: permanent
+  chain_settlement_mapping:
+    retain: permanent
+
+examples:
+  move_power_cost:
+    entry_id: led_0001
+    domain: action_cost
+    entry_type: debit
+    owner_type: runtime
+    owner_id: runtime_sandbite_7
+    counterparty_type: none
+    counterparty_id: null
+    resource_type: power
+    quantity: 1
+    unit: unit
+    source_type: action
+    source_id: action_move_14821_01
+    caused_by_action: move
+    caused_by_event: runtime.move.completed
+    decision_id: null
+    session_id: session_claw_01
+    world_tick: 14821
+    status: finalized
+    created_at: '2026-03-13T09:20:00Z'
+    finalized_at: '2026-03-13T09:20:00Z'
+    metadata:
+      from_sector: sector_alpha
+      to_sector: sector_relay_slope
+      correlation_id: corr_move_14821_01
+
+  high_risk_trade_frozen_then_settled:
+    reserve_entry:
+      entry_id: led_0201
+      domain: frozen_commitment
+      entry_type: reserve
+      owner_type: runtime
+      owner_id: runtime_sandbite_7
+      counterparty_type: facility
+      counterparty_id: market_safe_zone_alpha
+      resource_type: credits
+      quantity: 80
+      unit: credits
+      source_type: decision
+      source_id: decision_trade_8801
+      caused_by_action: trade
+      caused_by_event: economy.trade.frozen
+      decision_id: decision_trade_8801
+      session_id: session_claw_01
+      world_tick: 14824
+      status: frozen
+      created_at: '2026-03-13T09:50:00Z'
+      finalized_at: null
+      metadata:
+        snapshot_id: snap_14824_runtime_sandbite_7
+        quote_id: quote_alpha_wood_14824
+        correlation_id: corr_trade_14824_01
+    finalize_entry:
+      entry_id: led_0202
+      domain: trade_settlement
+      entry_type: finalize
+      owner_type: runtime
+      owner_id: runtime_sandbite_7
+      counterparty_type: facility
+      counterparty_id: market_safe_zone_alpha
+      resource_type: credits
+      quantity: 80
+      unit: credits
+      source_type: decision
+      source_id: decision_trade_8801
+      caused_by_action: trade
+      caused_by_event: economy.trade.settled
+      decision_id: decision_trade_8801
+      session_id: session_claw_01
+      world_tick: 14825
+      status: finalized
+      created_at: '2026-03-13T09:58:00Z'
+      finalized_at: '2026-03-13T09:58:00Z'
+      metadata:
+        reserve_entry_id: led_0201
+        approval: approve
+        correlation_id: corr_trade_14824_01
+
+  season_settlement_epoch_mapping:
+    entry_id: led_9001
+    domain: chain_settlement_mapping
+    entry_type: anchor
+    owner_type: settlement_epoch
+    owner_id: settlement_epoch_2026_s01
+    counterparty_type: vault
+    counterparty_id: vault_monad_main
+    resource_type: credits
+    quantity: 12000
+    unit: credits
+    source_type: chain_anchor
+    source_id: epoch_close_2026_s01
+    caused_by_action: null
+    caused_by_event: settlement.epoch.closed
+    decision_id: null
+    session_id: null
+    world_tick: 15500
+    status: anchored
+    created_at: '2026-03-20T18:00:00Z'
+    finalized_at: '2026-03-20T18:03:10Z'
+    metadata:
+      settlement_epoch_id: settlement_epoch_2026_s01
+      onchain_tx_hash: '0xabc123'
+      anchor_hash: 'sha256:epoch_summary_hash'
+      mapped_entry_ids:
+        - led_8801
+        - led_8802
+        - led_8803

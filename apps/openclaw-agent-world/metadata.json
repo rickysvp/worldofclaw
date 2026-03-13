@@ -1,0 +1,5 @@
+{
+  "name": "OpenClaw Agent World",
+  "description": "A minimal, text-based, proactive agent world where your Claw acts automatically.",
+  "requestFramePermissions": []
+}

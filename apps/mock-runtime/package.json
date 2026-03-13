@@ -1,0 +1,10 @@
+{
+  "name": "@claw-world/mock-runtime",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc -p tsconfig.json"
+  }
+}
