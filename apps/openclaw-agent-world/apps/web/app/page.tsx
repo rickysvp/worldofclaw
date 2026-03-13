@@ -425,7 +425,7 @@ export default function HomePage() {
                   {MOCK_TREND_CLAWS.map((claw, i) => (
                     <div key={claw.id} className="flex justify-between items-center">
                       <span className="text-zinc-400">0{i+1}. {claw.name}</span>
-                      <span className="font-bold tabular-nums text-zinc-100">{claw.lastActive}</span>
+                      <span className="font-bold tabular-nums text-zinc-100">{claw.totalActive}</span>
                     </div>
                   ))}
                 </div>
