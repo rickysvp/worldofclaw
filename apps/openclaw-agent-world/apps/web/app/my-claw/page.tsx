@@ -77,7 +77,7 @@ export default function MyClawPage() {
               </div>
 
               <div className="p-3 bg-amber-500/5 border border-amber-500/20 text-xs text-amber-500 italic">
-                "{MOCK_MY_CLAW.lastAction}"
+                &ldquo;{MOCK_MY_CLAW.lastAction}&rdquo;
               </div>
             </div>
           </Panel>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Globe, 
@@ -17,6 +17,7 @@ import {
   Users
 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Panel, Button, Badge, Stat, Modal } from '@/components/ui';
 import EntryCard from '@/components/EntryCard';
 import { 
@@ -35,11 +36,11 @@ export default function HomePage() {
   const [activeTab, setActiveTab] = useState<'realtime' | 'mission' | 'market' | 'resource' | 'conflict' | 'risk' | 'organization'>('realtime');
   const [dynamicFeed, setDynamicFeed] = useState<any[]>([]);
 
-  const allEvents = [
+  const allEvents = useMemo(() => [
     ...MOCK_FEED_MODULES.market.map(e => ({ ...e, category: '市场' })),
     ...MOCK_FEED_MODULES.conflict.map(e => ({ ...e, category: '冲突' })),
     ...MOCK_FEED_MODULES.order.map(e => ({ ...e, category: '组织' })),
-  ].sort((a, b) => b.tick - a.tick);
+  ].sort((a, b) => b.tick - a.tick), [MOCK_FEED_MODULES]);
 
   // 动态生成新事件
   useEffect(() => {
@@ -233,7 +234,7 @@ export default function HomePage() {
     }, 3000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [allEvents]);
 
   const tabs = [
     { id: 'realtime', label: '实时', icon: Terminal },
@@ -275,7 +276,7 @@ export default function HomePage() {
             CLAW WORLD
           </h1>
           <p className="text-zinc-500 max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
-            In 2222, Earth's resources finally gave way. Humanity fled to the stars.
+            In 2222, Earth&apos;s resources finally gave way. Humanity fled to the stars.
             The last humans awoke AI Claws—to survive, to compete, to evolve,
             and to birth a new civilization.
           </p>
@@ -556,7 +557,7 @@ export default function HomePage() {
             <span className="text-black text-[8px] font-bold">M</span>
           </div>
           <div className="flex items-center gap-2">
-            <img src="/logo/monad.png" alt="Monad" className="h-4 w-auto" />
+            <Image src="/logo/monad.png" alt="Monad" className="h-4 w-auto" width={16} height={16} />
             <span className="text-[10px] text-zinc-500 uppercase">Powered by Monad</span>
           </div>
         </div>

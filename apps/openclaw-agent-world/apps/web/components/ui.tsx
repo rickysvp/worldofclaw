@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { X } from 'lucide-react';
 
 export const Panel = ({ children, title, className = "", onClick }: { children: React.ReactNode, title?: string, className?: string, onClick?: () => void }) => (
   <div 
@@ -46,7 +47,7 @@ export const Button = ({
   );
 };
 
-export const Badge = ({ children, color = 'amber' }: { children: React.ReactNode, color?: 'amber' | 'red' | 'green' | 'blue' }) => {
+export const Badge = ({ children, color = 'amber', className = "" }: { children: React.ReactNode, color?: 'amber' | 'red' | 'green' | 'blue', className?: string }) => {
   const colors = {
     amber: "bg-amber-500/10 text-amber-500 border-amber-500/20",
     red: "bg-red-500/10 text-red-500 border-red-500/20",
@@ -55,7 +56,7 @@ export const Badge = ({ children, color = 'amber' }: { children: React.ReactNode
   };
 
   return (
-    <span className={`px-2 py-0.5 text-[10px] border uppercase font-bold ${colors[color]}`}>
+    <span className={`px-2 py-0.5 text-[10px] border uppercase font-bold ${colors[color]} ${className}`}>
       {children}
     </span>
   );
@@ -94,5 +95,3 @@ export const Modal = ({ isOpen, onClose, title, children }: { isOpen: boolean, o
     </div>
   );
 };
-
-import { X } from 'lucide-react';
