@@ -25,16 +25,16 @@ export const MOCK_TOP_CLAWS: Partial<Agent>[] = [
 ];
 
 export const MOCK_TREND_CLAWS = [
-  { id: 't1', name: 'Zephyr-3', activity: 98, trend: '+24%' },
-  { id: 't2', name: 'Pulse-9', activity: 92, trend: '+18%' },
-  { id: 't3', name: 'Surge-5', activity: 89, trend: '+15%' },
-  { id: 't4', name: 'Velocity-7', activity: 85, trend: '+12%' },
-  { id: 't5', name: 'Blitz-2', activity: 82, trend: '+9%' },
-  { id: 't6', name: 'Rush-8', activity: 78, trend: '+7%' },
-  { id: 't7', name: 'Sprint-4', activity: 75, trend: '+5%' },
-  { id: 't8', name: 'Dash-6', activity: 72, trend: '+3%' },
-  { id: 't9', name: 'Zoom-1', activity: 68, trend: '+2%' },
-  { id: 't10', name: 'Quick-5', activity: 65, trend: '+1%' },
+  { id: 't1', name: 'Zephyr-3', lastActive: '2分钟前', trend: '+24%' },
+  { id: 't2', name: 'Pulse-9', lastActive: '5分钟前', trend: '+18%' },
+  { id: 't3', name: 'Surge-5', lastActive: '8分钟前', trend: '+15%' },
+  { id: 't4', name: 'Velocity-7', lastActive: '12分钟前', trend: '+12%' },
+  { id: 't5', name: 'Blitz-2', lastActive: '15分钟前', trend: '+9%' },
+  { id: 't6', name: 'Rush-8', lastActive: '18分钟前', trend: '+7%' },
+  { id: 't7', name: 'Sprint-4', lastActive: '22分钟前', trend: '+5%' },
+  { id: 't8', name: 'Dash-6', lastActive: '25分钟前', trend: '+3%' },
+  { id: 't9', name: 'Zoom-1', lastActive: '30分钟前', trend: '+2%' },
+  { id: 't10', name: 'Quick-5', lastActive: '35分钟前', trend: '+1%' },
 ];
 
 export const MOCK_RICH_CLAWS = [
