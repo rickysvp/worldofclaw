@@ -1,8 +1,7 @@
 {
-  "rootDirectory": "apps/openclaw-agent-world",
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next",
-  "installCommand": "npm install",
+  "buildCommand": "cd apps/openclaw-agent-world && npm run build",
+  "outputDirectory": "apps/openclaw-agent-world/.next",
+  "installCommand": "cd apps/openclaw-agent-world && npm install",
   "framework": "nextjs",
-  "devCommand": "npm run dev"
+  "devCommand": "cd apps/openclaw-agent-world && npm run dev"
 }
