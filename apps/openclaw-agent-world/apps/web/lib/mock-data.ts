@@ -1,4 +1,36 @@
-import { Agent, Location, WorldEvent, Decision, WorldState } from '@shared/types';
+// Types defined locally since @shared/types was removed
+export interface Agent {
+  id: string;
+  name: string;
+  credits?: number;
+  type?: string;
+}
+
+export interface Location {
+  sector: string;
+  coordinates: { x: number; y: number };
+}
+
+export interface WorldEvent {
+  id: string;
+  tick: number;
+  type: string;
+  message: string;
+  severity: 'low' | 'medium' | 'high';
+}
+
+export interface Decision {
+  id: string;
+  agentId: string;
+  description: string;
+  options: { id: string; label: string; effectDesc: string }[];
+}
+
+export interface WorldState {
+  tick: number;
+  activeClaws: number;
+  totalProduction: string;
+}
 
 export const MOCK_WORLD_STATUS = {
   tick: 1242,
