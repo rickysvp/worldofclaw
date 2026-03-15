@@ -2,8 +2,12 @@
 export interface Agent {
   id: string;
   name: string;
-  credits?: number;
-  type?: string;
+  credits: number;
+  type: string;
+  location: string;
+  inventory: { type: string; amount: number }[];
+  status: 'idle' | 'working' | 'traveling' | 'resting';
+  lastAction?: string;
 }
 
 export interface Location {
@@ -24,6 +28,7 @@ export interface Decision {
   agentId: string;
   description: string;
   options: { id: string; label: string; effectDesc: string }[];
+  status: 'pending' | 'resolved';
 }
 
 export interface WorldState {
