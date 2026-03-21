@@ -7,10 +7,10 @@ from typing import Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from server.models import Claw, ClawStatus
-from server.world.map import WORLD_MAP, get_location
-from server.core.npc import npc_manager, NPCStatus
-from server.core.quest import quest_manager
+from backend.models import Claw, ClawStatus
+from backend.world.map import WORLD_MAP, get_location
+from backend.core.npc import npc_manager, NPCStatus
+from backend.core.quest import quest_manager
 
 
 # ==================== 电力系统 ====================

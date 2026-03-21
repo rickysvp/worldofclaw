@@ -5,9 +5,9 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
 
-from server.core.database import get_db
-from server.core import game
-from server.world.map import get_location, get_all_locations, get_connected_locations
+from backend.core.database import get_db
+from backend.core import game
+from backend.world.map import get_location, get_all_locations, get_connected_locations
 
 
 router = APIRouter()

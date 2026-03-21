@@ -3,10 +3,10 @@
 """
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from server.core.database import get_db
-from server.api.websocket import manager
-from server.core.events import event_manager
-from server.core import game
+from backend.core.database import get_db
+from backend.api.websocket import manager
+from backend.core.events import event_manager
+from backend.core import game
 
 router = APIRouter()
 

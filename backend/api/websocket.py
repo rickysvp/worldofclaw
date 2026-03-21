@@ -7,15 +7,15 @@ from fastapi import WebSocket, WebSocketDisconnect
 from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from server.core.database import db
-from server.core import game
-from server.core.npc import npc_manager, NPCStatus, NPCType
-from server.core.economy import shop_manager, Refinery, ITEMS_DB
-from server.core.quest import quest_manager
-from server.core.safehouse import safehouse_manager
-from server.core.events import event_manager
-from server.core.achievements import achievement_manager, ACHIEVEMENTS_DB
-from server.world.map import get_location, get_connected_locations, WORLD_MAP
+from backend.core.database import db
+from backend.core import game
+from backend.core.npc import npc_manager, NPCStatus, NPCType
+from backend.core.economy import shop_manager, Refinery, ITEMS_DB
+from backend.core.quest import quest_manager
+from backend.core.safehouse import safehouse_manager
+from backend.core.events import event_manager
+from backend.core.achievements import achievement_manager, ACHIEVEMENTS_DB
+from backend.world.map import get_location, get_connected_locations, WORLD_MAP
 
 
 class ConnectionManager:

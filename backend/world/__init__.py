@@ -1,4 +1,4 @@
 """World 模块"""
-from server.world import map
+from backend.world import map
 
 __all__ = ["map"]

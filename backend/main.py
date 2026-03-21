@@ -9,12 +9,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi import WebSocket
 from loguru import logger
 
-from server.core.database import db
-from server.core.npc import npc_manager
-from server.world.map import WORLD_MAP
-from server.api.routes import router as api_router
-from server.api.status import router as status_router
-from server.api.websocket import mud_websocket_endpoint
+from backend.core.database import db
+from backend.core.npc import npc_manager
+from backend.world.map import WORLD_MAP
+from backend.api.routes import router as api_router
+from backend.api.status import router as status_router
+from backend.api.websocket import mud_websocket_endpoint
 
 
 @asynccontextmanager

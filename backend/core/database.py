@@ -7,7 +7,7 @@ from typing import AsyncGenerator, Optional
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.pool import NullPool
 
-from server.models import Base
+from backend.models import Base
 
 
 class Database:
