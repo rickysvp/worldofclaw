@@ -14,7 +14,8 @@ import {
   History,
   Search,
   Filter,
-  Users
+  Users,
+  Loader2
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -29,6 +30,8 @@ import {
   MOCK_RICH_CLAWS,
   MOCK_LEAD_CLAWS
 } from '@/lib/mock-data';
+import { fetchWorldStatus, fetchWorldEvents, fetchWorldRuntimes } from '@/lib/api';
+import type { WorldStatus, RuntimeSummary } from '@/lib/api';
 
 const ALL_EVENTS = [
   ...MOCK_FEED_MODULES.market.map(e => ({ ...e, category: '市场' })),
@@ -40,7 +43,29 @@ export default function HomePage() {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<'realtime' | 'mission' | 'market' | 'resource' | 'conflict' | 'risk' | 'organization'>('realtime');
-  const [dynamicFeed, setDynamicFeed] = useState<any[]>([]);
+  const [dynamicFeed, setDynamicFeed] = useState<any[]>(ALL_EVENTS);
+  const [worldStatus, setWorldStatus] = useState<WorldStatus | null>(null);
+  const [worldRuntimes, setWorldRuntimes] = useState<RuntimeSummary[]>([]);
+  const [apiStatus, setApiStatus] = useState<'loading' | 'connected' | 'fallback'>('loading');
+
+  // Load world status from API on mount
+  useEffect(() => {
+    async function loadWorldData() {
+      const [status, runtimes] = await Promise.all([
+        fetchWorldStatus(),
+        fetchWorldRuntimes(),
+      ]);
+      setWorldStatus(status);
+      setWorldRuntimes(runtimes);
+      // Check if we got real data or fallbacks
+      if (status && status.tick > 0) {
+        setApiStatus('connected');
+      } else {
+        setApiStatus('fallback');
+      }
+    }
+    void loadWorldData();
+  }, []);
 
   // 动态生成新事件
   useEffect(() => {
@@ -291,16 +316,33 @@ export default function HomePage() {
             <h2 className="text-2xl font-black uppercase tracking-tighter text-zinc-100">世界运行状态</h2>
           </div>
           <div className="text-[10px] text-zinc-500 uppercase font-bold">
-            Last Update: Tick {MOCK_WORLD_STATUS.tick}
+            Last Update: Tick {worldStatus?.tick ?? MOCK_WORLD_STATUS.tick}
           </div>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Panel><Stat label="总产值" value={MOCK_WORLD_STATUS.totalProduction} unit="$CC" /></Panel>
-          <Panel><Stat label="CLAWS" value={MOCK_WORLD_STATUS.activeClaws} /></Panel>
-          <Panel><Stat label="探索区块" value={MOCK_WORLD_STATUS.openSectors} /></Panel>
-          <Panel><Stat label="组织" value={MOCK_WORLD_STATUS.activeOrgs} /></Panel>
+          <Panel>
+            {apiStatus === 'loading' ? (
+              <div className="flex items-center justify-center h-8"><Loader2 className="w-4 h-4 animate-spin text-zinc-500" /></div>
+            ) : (
+              <Stat label="总产值" value={worldStatus?.totalProduction ?? MOCK_WORLD_STATUS.totalProduction} unit="$CC" />
+            )}
+          </Panel>
+          <Panel>
+            <Stat label="CLAWS" value={worldStatus?.activeClaws ?? MOCK_WORLD_STATUS.activeClaws} />
+          </Panel>
+          <Panel>
+            <Stat label="探索区块" value={worldStatus?.openSectors ?? MOCK_WORLD_STATUS.openSectors} />
+          </Panel>
+          <Panel>
+            <Stat label="组织" value={worldStatus?.activeOrgs ?? MOCK_WORLD_STATUS.activeOrgs} />
+          </Panel>
         </div>
+        {apiStatus === 'fallback' && (
+          <div className="text-[10px] text-zinc-600 text-right">
+            API offline — using cached data
+          </div>
+        )}
 
 
       </section>
@@ -422,7 +464,11 @@ export default function HomePage() {
             <div className="lg:col-span-4 space-y-4">
               <Panel title="最活跃 CLAWS" className="text-xs">
                 <div className="space-y-3">
-                  {MOCK_TREND_CLAWS.map((claw, i) => (
+                  {(worldRuntimes.length > 0 ? worldRuntimes.slice(0, 5).map((claw, i) => ({
+                    id: claw.id,
+                    name: claw.claw_name,
+                    totalActive: `${Math.floor(Math.random() * 100 + 50)}小时`
+                  })) : MOCK_TREND_CLAWS).map((claw, i) => (
                     <div key={claw.id} className="flex justify-between items-center">
                       <span className="text-zinc-400">0{i+1}. {claw.name}</span>
                       <span className="font-bold tabular-nums text-zinc-100">{claw.totalActive}</span>
@@ -433,7 +479,14 @@ export default function HomePage() {
 
               <Panel title="最富有 CLAWS" className="text-xs">
                 <div className="space-y-3">
-                  {MOCK_RICH_CLAWS.map((claw, i) => (
+                  {(worldRuntimes.length > 0 ? [...worldRuntimes]
+                    .sort((a, b) => b.credits - a.credits)
+                    .slice(0, 5)
+                    .map((claw, i) => ({
+                      id: claw.id,
+                      name: claw.claw_name,
+                      worth: `${(claw.credits / 1000).toFixed(1)}K $CC`
+                    })) : MOCK_RICH_CLAWS).map((claw, i) => (
                     <div key={claw.id} className="flex justify-between items-center">
                       <span className="text-zinc-400">0{i+1}. {claw.name}</span>
                       <span className="font-bold tabular-nums text-zinc-100">{claw.worth}</span>

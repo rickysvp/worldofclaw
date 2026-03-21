@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   MapPin, 
@@ -13,14 +13,35 @@ import {
   GraduationCap,
   ArrowLeft,
   Settings,
-  AlertCircle
+  AlertCircle,
+  Loader2
 } from 'lucide-react';
 import Link from 'next/link';
 import { Panel, Button, Badge, Stat } from '@/components/ui';
 import { MOCK_MY_CLAW } from '@/lib/mock-data';
+import { fetchRuntimeById } from '@/lib/api';
+import type { Agent } from '@/lib/mock-data';
 
 export default function MyClawPage() {
-  return (
+  const [clawData, setClawData] = useState<Agent>(MOCK_MY_CLAW);
+  const [loading, setLoading] = useState(false);
+
+  // Try to load real claw data from API
+  useEffect(() => {
+    // Get runtime ID from URL or localStorage
+    const runtimeId = localStorage.getItem('claw_runtime_id');
+    if (!runtimeId) return;
+
+    async function loadClaw() {
+      setLoading(true);
+      const data = await fetchRuntimeById(runtimeId);
+      setLoading(false);
+      if (data) setClawData(data);
+    }
+    void loadClaw();
+  }, []);
+
+  const myClaw = clawData;
     <div className="max-w-7xl mx-auto px-6 py-12 space-y-8">
       <header className="flex items-center justify-between border-b border-zinc-800 pb-6">
         <div className="flex items-center gap-4">
@@ -31,7 +52,7 @@ export default function MyClawPage() {
           </Link>
           <div>
             <h1 className="text-2xl font-black uppercase tracking-tighter text-zinc-100">我的 CLAW 控制台</h1>
-            <p className="text-[10px] text-zinc-500 uppercase tracking-widest">ID: {MOCK_MY_CLAW.id} | Status: Connected</p>
+            <p className="text-[10px] text-zinc-500 uppercase tracking-widest">ID: {myClaw.id} | Status: {loading ? 'Loading...' : 'Connected'}</p>
           </div>
         </div>
         <div className="flex gap-2">
@@ -51,9 +72,9 @@ export default function MyClawPage() {
             <div className="space-y-6">
               <div className="flex justify-between items-start">
                 <div className="space-y-1">
-                  <h3 className="text-xl font-bold text-zinc-100">{MOCK_MY_CLAW.name}</h3>
-                  <Badge color={MOCK_MY_CLAW.status === 'working' ? 'green' : 'amber'}>
-                    {MOCK_MY_CLAW.status === 'working' ? '正在运行' : '待机中'}
+                  <h3 className="text-xl font-bold text-zinc-100">{myClaw.name}</h3>
+                  <Badge color={myClaw.status === 'working' ? 'green' : 'amber'}>
+                    {myClaw.status === 'working' ? '正在运行' : '待机中'}
                   </Badge>
                 </div>
                 <div className="w-12 h-12 bg-zinc-800 flex items-center justify-center industrial-border">
@@ -62,8 +83,8 @@ export default function MyClawPage() {
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <Stat label="信用点" value={MOCK_MY_CLAW.credits} unit="$CC" />
-                <Stat label="当前位置" value={MOCK_MY_CLAW.location} />
+                <Stat label="信用点" value={myClaw.credits} unit="$CC" />
+                <Stat label="当前位置" value={myClaw.location} />
               </div>
 
               <div className="space-y-2">
@@ -77,14 +98,14 @@ export default function MyClawPage() {
               </div>
 
               <div className="p-3 bg-amber-500/5 border border-amber-500/20 text-xs text-amber-500 italic">
-                &ldquo;{MOCK_MY_CLAW.lastAction}&rdquo;
+                &ldquo;{myClaw.lastAction}&rdquo;
               </div>
             </div>
           </Panel>
 
           <Panel title="物资清单">
             <div className="space-y-4">
-              {MOCK_MY_CLAW.inventory.map((item, i) => (
+              {(myClaw.inventory ?? MOCK_MY_CLAW.inventory).map((item, i) => (
                 <div key={i} className="flex items-center justify-between p-2 bg-zinc-900/50 border border-zinc-800">
                   <div className="flex items-center gap-3">
                     <Package size={14} className="text-zinc-500" />

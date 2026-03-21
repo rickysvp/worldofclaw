@@ -8,6 +8,7 @@ import { decisionRoute } from "./modules/decision/decision.route";
 import { healthRoute } from "./modules/health/health.route";
 import { runtimeRoute } from "./modules/runtime/runtime.route";
 import { telegramRoute } from "./modules/telegram/telegram.route";
+import { worldRoute } from "./modules/world/world.route";
 import { isAppError } from "./lib/errors";
 
 declare module "fastify" {
@@ -25,6 +26,7 @@ export const buildApp = (): FastifyInstance => {
   app.register(runtimeRoute);
   app.register(decisionRoute);
   app.register(telegramRoute);
+  app.register(worldRoute);
   app.register(adminRoute);
 
   const stopTimeoutJob = startDecisionTimeoutJob(db, app.log);
