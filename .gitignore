@@ -5,3 +5,10 @@ coverage/
 .DS_Store
 *.log
 docs/generated/
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.db
+*.log
+data/
