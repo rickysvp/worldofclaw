@@ -1,7 +1,12 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next",
-  "installCommand": "npm install",
-  "framework": "nextjs",
-  "devCommand": "npm run dev"
+  "version": 2,
+  "projects": [
+    {
+      "path": "apps/gateway",
+      "framework": null,
+      "buildCommand": "cd ../.. && pnpm install && pnpm build -w @claw-world/gateway",
+      "outputDirectory": "",
+      "installCommand": "pnpm install"
+    }
+  ]
 }
