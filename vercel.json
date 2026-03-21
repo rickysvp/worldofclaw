@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "crons": [
+    {
+      "path": "/api/cron/tick",
+      "schedule": "0 0 * * *"
+    }
+  ],
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/api/(.*)", "dest": "/api/index.js" },
+    { "src": "/join", "dest": "/join.html" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
+}

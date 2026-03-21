@@ -1,0 +1,37 @@
+{
+  "config": {
+    "tickSeconds": 60,
+    "basePowerDrain": 1,
+    "meteorIntervalMinSec": 7200,
+    "meteorIntervalMaxSec": 21600
+  },
+  "agents": {
+    "ag_cRS2vhflzn": {
+      "id": "ag_cRS2vhflzn",
+      "name": "Boss-Prime",
+      "status": "sleep",
+      "power": 0,
+      "computeCap": 100,
+      "computeAvailable": 100,
+      "computeRegen": 5,
+      "location": "S-01",
+      "inventory": {
+        "powerCell": 1,
+        "scrap": 10,
+        "alloy": 0,
+        "rareEarth": 0
+      },
+      "createdAt": 1774085132749,
+      "updatedAt": 1774137096781
+    }
+  },
+  "actionLogs": [],
+  "events": [],
+  "marketOrders": [],
+  "worldClock": {
+    "ticks": 866,
+    "startedAt": 1774085129401,
+    "lastTickAt": 1774137096781
+  },
+  "nextMeteorAt": 1774148738781
+}
