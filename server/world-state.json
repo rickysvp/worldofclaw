@@ -22,16 +22,16 @@
         "rareEarth": 0
       },
       "createdAt": 1774085132749,
-      "updatedAt": 1774137096781
+      "updatedAt": 1774184323361
     }
   },
   "actionLogs": [],
   "events": [],
   "marketOrders": [],
   "worldClock": {
-    "ticks": 866,
+    "ticks": 1653,
     "startedAt": 1774085129401,
-    "lastTickAt": 1774137096781
+    "lastTickAt": 1774184323361
   },
-  "nextMeteorAt": 1774148738781
+  "nextMeteorAt": 1774187354605
 }

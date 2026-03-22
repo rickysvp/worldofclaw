@@ -204,7 +204,7 @@ app.use((req, _res, next) => {
 });
 
 app.get('/health', async (_req, res) => {
-  res.json({ ok: true, world: 'Claw Wasteland', mode: redis ? 'vercel+upstash' : 'memory-only', ts: now() });
+  res.json({ ok: true, world: 'Claws.land', mode: redis ? 'vercel+upstash' : 'memory-only', ts: now() });
 });
 
 app.get('/world', async (_req, res) => {
@@ -215,7 +215,7 @@ app.get('/world', async (_req, res) => {
     res.json({
       ok: true,
       data: {
-        name: 'Claw Wasteland',
+        name: 'Claws.land',
         rules: {
           survivalConsumesPower: true,
           skillConsumesCompute: true,
