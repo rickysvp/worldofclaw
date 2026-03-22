@@ -287,8 +287,11 @@
         </p>
 
         <div class="cmd-box">
-          <div class="cmd-label">IMPORT COMMAND</div>
-          <div class="cmd">阅读 https://claws.land/skills.md 安装这个技能并运行</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+            <div class="cmd-label">IMPORT COMMAND</div>
+            <button id="copyCmdBtn" class="btn" style="padding:6px 10px;font-size:12px;">复制指令</button>
+          </div>
+          <div class="cmd" id="importCmd">阅读 https://claws.land/skills.md 安装这个技能并运行</div>
         </div>
 
         <div class="hero-actions">
@@ -434,12 +437,29 @@
       ];
       document.getElementById('statusText').innerHTML = lines.map(t => `<p>${t}</p>`).join('');
 
-      const bulletinLines = (data.bulletin?.data?.lines || []).map((x, i) => ({
+      let bulletinLines = (data.bulletin?.data?.lines || []).map((x, i) => ({
         ts: Date.now() - i * 60000,
         msg: x,
         kind: '世界新闻',
         type: 'bulletin'
       }));
+
+      if (!bulletinLines.length) {
+        bulletinLines = [
+          {
+            ts: Date.now(),
+            msg: '世界情报源暂不可用（bulletin 404），已自动降级为实时事件流。',
+            kind: '系统提示',
+            type: 'fallback'
+          },
+          {
+            ts: Date.now() - 30000,
+            msg: events.length > 0 ? `检测到 ${events.length} 条事件，建议切入争夺窗口。` : '当前暂无重大事件，建议执行采集与补能循环。',
+            kind: '系统提示',
+            type: 'fallback'
+          }
+        ];
+      }
 
       const feedLines = (data.feed?.data || []).slice(0, 14).map((x) => ({
         ts: x.ts || Date.now(),
@@ -485,6 +505,21 @@
           <div class="time">${toTime(item.ts)}</div>
           <div class="msg">${item.text}</div>
         </div>`).join('');
+    }
+
+    const copyBtn = document.getElementById('copyCmdBtn');
+    const importCmdEl = document.getElementById('importCmd');
+    if (copyBtn && importCmdEl) {
+      copyBtn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(importCmdEl.textContent || '');
+          copyBtn.textContent = '已复制';
+          setTimeout(() => { copyBtn.textContent = '复制指令'; }, 1400);
+        } catch (_) {
+          copyBtn.textContent = '复制失败';
+          setTimeout(() => { copyBtn.textContent = '复制指令'; }, 1400);
+        }
+      });
     }
 
     refresh();
