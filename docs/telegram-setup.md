@@ -31,7 +31,24 @@ curl -X POST "https://api.telegram.org/bot<TELEGRAM_BOT_TOKEN>/setWebhook" \
   }'
 ```
 
-## 5. Link the chat to a runtime owner
+For Railway production, replace the tunnel URL with:
+
+```text
+https://<your-railway-domain>/api/telegram/webhook
+```
+
+## 5. Verify webhook health
+```bash
+curl "https://api.telegram.org/bot<TELEGRAM_BOT_TOKEN>/getWebhookInfo"
+```
+
+You should confirm:
+- `url` points at the Railway gateway domain
+- `has_custom_certificate` is `false`
+- `pending_update_count` is not growing unexpectedly
+- `last_error_message` is empty during normal operation
+
+## 6. Link the chat to a runtime owner
 1. Register a runtime through `/api/runtime/register`.
 2. Copy `telegram_link_code` from the response.
 3. In Telegram, send:
@@ -42,7 +59,7 @@ curl -X POST "https://api.telegram.org/bot<TELEGRAM_BOT_TOKEN>/setWebhook" \
 
 The gateway will activate the matching `telegram_links` record and bind the current chat.
 
-## 6. Available Telegram commands
+## 7. Available Telegram commands
 - `/start`
 - `/link <code>`
 - `/status`
@@ -52,9 +69,14 @@ The gateway will activate the matching `telegram_links` record and bind the curr
 - `/modify <decision_id> budget_cap <value>`
 - `/modify <decision_id> route_risk <value>`
 
-## 7. Validation and safety rules
+## 8. Validation and safety rules
 - Webhook requests must include `x-telegram-bot-api-secret-token`.
 - Only linked chats can use `/status` or resolve decisions.
 - Decision commands verify the decision belongs to the linked user runtime.
 - Duplicate Telegram messages are idempotent through `idempotency_keys`.
 - Free-form text never becomes executable runtime control.
+
+## 9. Alpha deployment notes
+- Telegram is the only operator decision surface in alpha.
+- The frontend observer panel must never expose approve, reject, or modify actions.
+- If webhook delivery fails, decisions remain in gateway and can be inspected through admin/debug routes.

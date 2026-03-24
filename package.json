@@ -9,8 +9,9 @@
   ],
   "scripts": {
     "test": "vitest run",
-    "dev:web": "npm run dev -w @openclaw/web",
-    "build:web": "npm run build -w @openclaw/web",
+    "dev:web": "npm run dev -w @openclaw/observer-panel",
+    "build:web": "npm run build -w @openclaw/observer-panel",
+    "typecheck:web": "npm run typecheck -w @openclaw/observer-panel",
     "demo:openclaw": "vitest run tests/demo/openclaw-visible-demo.test.ts --reporter=verbose",
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
@@ -28,6 +29,8 @@
     "dev:gateway": "npm run dev -w @claw-world/gateway",
     "build:gateway": "npm run build -w @claw-world/gateway",
     "dev:mock-runtime": "npm run dev -w @claw-world/mock-runtime",
+    "seed:alpha": "tsx scripts/alpha-seed.ts",
+    "smoke:alpha": "tsx scripts/alpha-smoke.ts",
     "db:generate": "npm run db:generate -w @claw-world/gateway",
     "db:migrate": "npm run db:migrate -w @claw-world/gateway"
   },
@@ -36,20 +39,21 @@
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "nanoid": "^5.0.7",
-    "serverless-http": "^3.2.0"
+    "serverless-http": "^3.2.0",
+    "yaml": "^2.8.3"
   },
   "devDependencies": {
     "@types/node": "^22.13.10",
-    "typescript": "^5.8.2",
-    "vitest": "^1.6.1",
-    "zod": "^3.25.76",
+    "dotenv": "^16.4.7",
     "drizzle-kit": "^0.30.6",
     "drizzle-orm": "^0.40.0",
-    "dotenv": "^16.4.7",
     "fastify": "^5.2.1",
     "pg": "^8.14.1",
     "tsx": "^4.19.3",
-    "vercel": "^50.34.3"
+    "typescript": "^5.8.2",
+    "vercel": "^50.34.3",
+    "vitest": "^1.6.1",
+    "zod": "^3.25.76"
   },
   "packageManager": "pnpm@10.6.2"
 }

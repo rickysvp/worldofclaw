@@ -6,6 +6,8 @@ import { startDecisionTimeoutJob } from "./jobs/decision-timeout.job";
 import { adminRoute } from "./modules/admin/admin.route";
 import { decisionRoute } from "./modules/decision/decision.route";
 import { healthRoute } from "./modules/health/health.route";
+import { meRoute } from "./modules/me/me.route";
+import { publicRoute } from "./modules/public/public.route";
 import { runtimeRoute } from "./modules/runtime/runtime.route";
 import { telegramRoute } from "./modules/telegram/telegram.route";
 import { isAppError } from "./lib/errors";
@@ -26,6 +28,8 @@ export const buildApp = (): FastifyInstance => {
   app.register(decisionRoute);
   app.register(telegramRoute);
   app.register(adminRoute);
+  app.register(publicRoute);
+  app.register(meRoute);
 
   const stopTimeoutJob = startDecisionTimeoutJob(db, app.log);
 

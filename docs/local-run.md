@@ -20,6 +20,8 @@ Then fill at least:
 - `APP_PORT`
 - `APP_HOST`
 - `APP_BASE_URL`
+- `NEXT_PUBLIC_API_BASE_URL`
+- `NEXT_PUBLIC_DEFAULT_USER_REF`
 - `TELEGRAM_BOT_TOKEN`
 - `TELEGRAM_WEBHOOK_SECRET`
 - `RUNTIME_TOKEN_SECRET`
@@ -36,12 +38,46 @@ If your database is empty and you prefer Drizzle commands:
 pnpm db:migrate
 ```
 
-## 5. Start gateway
+## 5. Seed alpha demo data
+```bash
+pnpm seed:alpha
+```
+
+This creates:
+- 4 demo runtimes
+- shared world feed entries derived from `runtime_events`
+- leaderboard source rows
+- one demo user + active Telegram link
+- one pending high-risk decision
+- ledger summary data
+
+## 6. Start gateway
 ```bash
 pnpm dev:gateway
 ```
 
-## 6. Register a runtime
+## 7. Start the observer frontend
+```bash
+pnpm dev:web
+```
+
+Open:
+```text
+http://localhost:3000
+```
+
+Useful pages:
+- `/`
+- `/world-feed`
+- `/my-claw?user_ref=alpha_demo_user`
+- `/leaderboard`
+
+## 8. Run the alpha smoke script
+```bash
+pnpm smoke:alpha
+```
+
+## 9. Register a runtime
 ```bash
 curl -X POST http://localhost:4000/api/runtime/register \
   -H 'content-type: application/json' \
@@ -59,7 +95,7 @@ The response now includes:
 - `auth_token`
 - `telegram_link_code`
 
-## 7. Heartbeat
+## 10. Heartbeat
 ```bash
 curl -X POST http://localhost:4000/api/runtime/heartbeat \
   -H 'content-type: application/json' \
@@ -77,7 +113,7 @@ curl -X POST http://localhost:4000/api/runtime/heartbeat \
   }'
 ```
 
-## 8. Create a high-risk decision
+## 11. Create a high-risk decision
 ```bash
 curl -X POST http://localhost:4000/api/runtime/events/decision-needed \
   -H 'x-runtime-auth-token: <auth_token>' \
@@ -103,17 +139,17 @@ curl -X POST http://localhost:4000/api/runtime/events/decision-needed \
   }'
 ```
 
-## 9. Link Telegram and resolve the decision
+## 12. Link Telegram and resolve the decision
 - In Telegram, send `/link <telegram_link_code>`
 - Then send `/approve <decision_id>` or `/reject <decision_id>` or `/modify <decision_id> quantity 6`
 
-## 10. Poll runtime commands
+## 13. Poll runtime commands
 ```bash
 curl "http://localhost:4000/api/runtime/commands/poll?runtime_id=<runtime_id>&session_id=<session_id>&mark_delivered=true" \
   -H 'x-runtime-auth-token: <auth_token>'
 ```
 
-## 11. Report action result
+## 14. Report action result
 ```bash
 curl -X POST http://localhost:4000/api/runtime/events/action-result \
   -H 'content-type: application/json' \
@@ -134,7 +170,18 @@ curl -X POST http://localhost:4000/api/runtime/events/action-result \
   }'
 ```
 
-## 12. Debug queries
+## 15. Read-only observer APIs
+```bash
+curl http://localhost:4000/api/public/world-feed
+curl http://localhost:4000/api/public/world-status
+curl http://localhost:4000/api/public/leaderboard
+curl "http://localhost:4000/api/me/claw-summary?user_ref=alpha_demo_user"
+curl "http://localhost:4000/api/me/pending-decisions?user_ref=alpha_demo_user"
+curl "http://localhost:4000/api/me/runtime-events?user_ref=alpha_demo_user"
+curl "http://localhost:4000/api/me/ledger-summary?user_ref=alpha_demo_user"
+```
+
+## 16. Debug queries
 ```bash
 curl http://localhost:4000/api/admin/runtimes/<runtime_id> -H 'x-admin-secret: <ADMIN_API_SECRET>'
 curl http://localhost:4000/api/admin/decisions/<decision_id> -H 'x-admin-secret: <ADMIN_API_SECRET>'
@@ -144,7 +191,7 @@ curl http://localhost:4000/api/admin/runtimes/<runtime_id>/commands -H 'x-admin-
 curl "http://localhost:4000/api/admin/ledger?decision_id=<decision_id>" -H 'x-admin-secret: <ADMIN_API_SECRET>'
 ```
 
-## 13. Mock runtime demo
+## 17. Mock runtime demo
 ```bash
 pnpm dev:mock-runtime -- demo-flow
 ```
