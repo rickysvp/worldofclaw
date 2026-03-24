@@ -1,0 +1,55 @@
+name: Online Smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Gateway base URL to verify, for example https://worldofclaw-gateway.up.railway.app"
+        required: false
+        type: string
+      user_ref:
+        description: "Viewer user ref for me endpoints"
+        required: false
+        default: "alpha_demo_user"
+        type: string
+  repository_dispatch:
+    types:
+      - online-smoke
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      ALPHA_SMOKE_BASE_URL: ${{ inputs.base_url || vars.ALPHA_SMOKE_BASE_URL || secrets.ALPHA_SMOKE_BASE_URL }}
+      ALPHA_SMOKE_USER_REF: ${{ inputs.user_ref || vars.ALPHA_SMOKE_USER_REF || 'alpha_demo_user' }}
+      NEXT_PUBLIC_DEFAULT_USER_REF: ${{ inputs.user_ref || vars.ALPHA_SMOKE_USER_REF || 'alpha_demo_user' }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN || 'telegram_bot_token_placeholder' }}
+      TELEGRAM_WEBHOOK_SECRET: ${{ secrets.TELEGRAM_WEBHOOK_SECRET || 'telegram_webhook_secret_placeholder' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.6.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate smoke target
+        run: |
+          if [ -z "$ALPHA_SMOKE_BASE_URL" ]; then
+            echo "ALPHA_SMOKE_BASE_URL is required. Pass workflow input base_url or set repo variable/secret ALPHA_SMOKE_BASE_URL."
+            exit 1
+          fi
+
+      - name: Run alpha smoke against deployed gateway
+        run: pnpm smoke:alpha

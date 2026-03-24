@@ -1,7 +1,21 @@
 {
+  "version": 2,
   "buildCommand": "npm run build",
   "outputDirectory": ".next",
   "installCommand": "npm install",
   "framework": "nextjs",
-  "devCommand": "npm run dev"
+  "devCommand": "npm run dev",
+  "crons": [
+    {
+      "path": "/api/cron/tick",
+      "schedule": "0 0 * * *"
+    }
+  ],
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/api/(.*)", "dest": "/api/index.js" },
+    { "src": "/join", "dest": "/join.html" },
+    { "src": "/create", "dest": "/create.html" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
 }
