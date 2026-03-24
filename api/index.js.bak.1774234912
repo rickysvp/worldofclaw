@@ -10,7 +10,6 @@ const redis = process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_RE
 
 const STATE_KEY = 'cw:state:v2';
 const NAMES = ['Zephyr', 'Pulse', 'Surge', 'Velocity', 'Blitz', 'Rush', 'Sprint', 'Dash', 'Zoom', 'Quick', 'Vault', 'Forge', 'Echo', 'Nova'];
-const APP_VERSION = 'v0.2.3';
 
 const DEFAULT_STATE = {
   config: {
@@ -20,19 +19,9 @@ const DEFAULT_STATE = {
     meteorIntervalMaxSec: 10800,
     npcTarget: 24
   },
-  release: {
-    version: APP_VERSION,
-    publishedAt: Date.now(),
-    notes: [
-      '拆分世界新闻与世界广播：新闻仅版本公告，广播仅重大运行事件',
-      'aiperp 后端切换为实时 tick + NPC 行为流',
-      'events 合并实时动作流，前端动态不再空白'
-    ]
-  },
   agents: {},
   actionLogs: [],
   events: [],
-  broadcasts: [],
   worldClock: { ticks: 0, startedAt: Date.now(), lastTickAt: Date.now() },
   nextMeteorAt: Date.now() + 1000 * 1800
 };
@@ -73,18 +62,6 @@ function mkAgent(name, isNPC = false) {
     createdAt: now(),
     updatedAt: now()
   };
-}
-
-function ensureRuntimeConfig(state) {
-  // 实时世界模式：把历史 10 分钟 tick 自动迁移到 10 秒 tick
-  if (!state.config) state.config = {};
-  if (!state.config.tickSeconds || state.config.tickSeconds > 30) state.config.tickSeconds = 10;
-  if (!state.config.basePowerDrain) state.config.basePowerDrain = 1;
-  if (!state.config.meteorIntervalMinSec) state.config.meteorIntervalMinSec = 3600;
-  if (!state.config.meteorIntervalMaxSec) state.config.meteorIntervalMaxSec = 10800;
-  if (!state.config.npcTarget) state.config.npcTarget = 24;
-  if (!state.broadcasts) state.broadcasts = [];
-  if (!state.release) state.release = DEFAULT_STATE.release;
 }
 
 function ensurePopulation(state) {
@@ -128,20 +105,9 @@ function scheduleNextMeteor(state) {
   state.nextMeteorAt = now() + gap * 1000;
 }
 
-function emitBroadcast(state, type, payload = {}) {
-  state.broadcasts.unshift({
-    id: `bc_${nanoid(10)}`,
-    type,
-    channel: 'world_broadcast',
-    payload,
-    ts: now()
-  });
-  if (state.broadcasts.length > 2000) state.broadcasts = state.broadcasts.slice(0, 2000);
-}
-
 function spawnMeteor(state) {
   const level = randomMeteorLevel();
-  const evt = {
+  state.events.unshift({
     id: `evt_${nanoid(10)}`,
     type: 'METEOR_FALL',
     level,
@@ -149,10 +115,8 @@ function spawnMeteor(state) {
     zoneHint: `Z-${Math.floor(Math.random() * 99) + 1}`,
     startedAt: now(),
     expiresAt: now() + 1000 * 60 * 45
-  };
-  state.events.unshift(evt);
+  });
   if (state.events.length > 500) state.events = state.events.slice(0, 500);
-  emitBroadcast(state, 'METEOR_FALL', { level: evt.level, zoneHint: evt.zoneHint, expiresAt: evt.expiresAt });
 }
 
 function runNpcAI(state) {
@@ -213,11 +177,6 @@ function processOneTick(state) {
 
   runNpcAI(state);
 
-  const lowPowerAgents = Object.values(state.agents).filter((a) => a.power <= 10).length;
-  if (lowPowerAgents >= 8) {
-    emitBroadcast(state, 'POWER_GRID_ALERT', { lowPowerAgents });
-  }
-
   state.events = state.events.filter((e) => !e.expiresAt || e.expiresAt > now());
 }
 
@@ -229,7 +188,6 @@ function catchUpTicks(state) {
 
 async function withState(handler) {
   const state = await loadState();
-  ensureRuntimeConfig(state);
   ensurePopulation(state);
   catchUpTicks(state);
   const result = await handler(state);
@@ -243,24 +201,6 @@ app.use(express.json());
 app.use((req, _res, next) => {
   if (req.url.startsWith('/api/')) req.url = req.url.slice(4) || '/';
   next();
-});
-
-app.get('/', (_req, res) => {
-  res.json({
-    ok: true,
-    service: 'claws-land-world-api',
-    version: APP_VERSION,
-    endpoints: {
-      health: '/health',
-      world: '/world',
-      agents: '/agents',
-      events: '/events',
-      feed: '/feed',
-      news: '/news',
-      broadcasts: '/broadcasts',
-      bulletin: '/bulletin'
-    }
-  });
 });
 
 app.get('/health', async (_req, res) => {
@@ -286,7 +226,7 @@ app.get('/world', async (_req, res) => {
         nextMeteorAt: state.nextMeteorAt,
         metrics: {
           agents: agents.length,
-          events: Math.max(state.events.length, Math.min(200, state.actionLogs.length)),
+          events: state.events.length,
           totalRare,
           totalAlloy
         }
@@ -380,45 +320,8 @@ app.post('/agents/:id/actions', async (req, res) => {
   });
 });
 
-app.get('/events', async (req, res) => {
-  await withState(async (state) => {
-    const limit = Math.max(1, Math.min(200, Number(req.query?.limit ?? 80)));
-
-    const coreEvents = state.events.map((e) => ({
-      id: e.id,
-      type: e.type || 'SYSTEM',
-      level: e.level || 'M1',
-      status: e.status || 'active',
-      zoneHint: e.zoneHint,
-      startedAt: e.startedAt || e.ts || now(),
-      source: 'world'
-    }));
-
-    const actionToEventType = {
-      scavenge: 'ACTION_SCAVENGE',
-      refine: 'ACTION_REFINE',
-      mine_meteor: 'ACTION_MINE_METEOR',
-      charge: 'ACTION_CHARGE'
-    };
-
-    const feedEvents = state.actionLogs.slice(0, 120).map((l) => ({
-      id: `evt_from_${l.id}`,
-      type: actionToEventType[l.actionType] || 'ACTION_GENERIC',
-      level: 'M1',
-      status: 'done',
-      agentId: l.agentId,
-      actionType: l.actionType,
-      result: l.result,
-      startedAt: l.ts,
-      source: 'feed'
-    }));
-
-    const merged = [...coreEvents, ...feedEvents]
-      .sort((a, b) => (b.startedAt || 0) - (a.startedAt || 0))
-      .slice(0, limit);
-
-    res.json({ ok: true, data: merged });
-  });
+app.get('/events', async (_req, res) => {
+  await withState(async (state) => res.json({ ok: true, data: state.events.slice(0, 50) }));
 });
 
 app.get('/leaderboard', async (_req, res) => {
@@ -445,51 +348,40 @@ app.get('/feed', async (_req, res) => {
   });
 });
 
-app.get('/news', async (_req, res) => {
+app.get('/bulletin', async (_req, res) => {
   await withState(async (state) => {
-    res.json({
-      ok: true,
-      data: {
-        channel: 'world_news',
-        version: state.release?.version || APP_VERSION,
-        publishedAt: state.release?.publishedAt || now(),
-        notes: state.release?.notes || []
-      }
-    });
-  });
-});
+    const agents = Object.values(state.agents);
+    const top = agents
+      .map((a) => ({ name: a.name, rare: a.inventory?.rareEarth || 0, score: (a.inventory?.rareEarth || 0) * 100 + (a.inventory?.alloy || 0) * 20 + (a.inventory?.scrap || 0) }))
+      .sort((a, b) => b.score - a.score)[0];
 
-app.get('/broadcasts', async (req, res) => {
-  await withState(async (state) => {
-    const limit = Math.max(1, Math.min(200, Number(req.query?.limit ?? 80)));
-    res.json({ ok: true, channel: 'world_broadcast', data: state.broadcasts.slice(0, limit) });
-  });
-});
+    const recent = state.actionLogs.slice(0, 12).reverse();
+    const id2name = Object.fromEntries(agents.map((a) => [a.id, a.name]));
+    const actionMap = {
+      scavenge: '在废墟中搜集到可用废料',
+      refine: '完成了一次冶炼，合金库存上升',
+      mine_meteor: '在陨石区成功提取到稀土',
+      charge: '回到电桩完成补能'
+    };
 
-app.get('/bulletin', async (req, res) => {
-  await withState(async (state) => {
-    const limit = Math.max(1, Math.min(50, Number(req.query?.limit ?? 10)));
-    const items = state.broadcasts.slice(0, limit);
-    const lines = items.map((b) => {
-      if (b.type === 'METEOR_FALL') {
-        return `【广播】陨石 ${b.payload?.level || '-'} 级坠落，区域 ${b.payload?.zoneHint || '-'}，窗口开放中。`;
-      }
-      if (b.type === 'POWER_GRID_ALERT') {
-        return `【广播】电网压力告警：低电量 Agent ${b.payload?.lowPowerAgents ?? '-'} 个。`;
-      }
-      return `【广播】${b.type}`;
-    });
+    const lines = [];
+    lines.push(`【世界播报】当前共有 ${agents.length} 名 Claw 存活于废土。`);
+    if (top) lines.push(`【头部势力】${top.name} 目前领跑，文明积分 ${top.score}。`);
 
-    res.json({
-      ok: true,
-      data: {
-        channel: 'world_broadcast',
-        updatedAt: now(),
-        items,
-        // 兼容旧前端（旧版读取 data.lines）
-        lines
-      }
-    });
+    const activeMeteor = state.events.find((e) => e.type === 'METEOR_FALL');
+    if (activeMeteor) {
+      lines.push(`【天象】检测到 ${activeMeteor.level} 级陨石活动，区域 ${activeMeteor.zoneHint} 出现短期开采窗口。`);
+    } else {
+      lines.push('【天象】暂未发现新的陨石坠落，地表进入短暂平稳期。');
+    }
+
+    for (const l of recent.slice(-5)) {
+      const who = id2name[l.agentId] || '未知Claw';
+      const act = actionMap[l.actionType] || `执行了 ${l.actionType}`;
+      lines.push(`- ${who}${act}。`);
+    }
+
+    res.json({ ok: true, data: { updatedAt: now(), lines } });
   });
 });
 
